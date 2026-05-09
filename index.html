@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="ma-garinのQAエンジニア向けポートフォリオサイトです。">
-    <title>ma-garin | QA Portfolio</title>
+    <meta name="description" content="Yuki Fujimagari / ma-garinのQAエンジニア向けポートフォリオサイトです。">
+    <title>Yuki Fujimagari | QA Portfolio</title>
     <style>
       :root {
         color-scheme: light;
@@ -376,6 +376,36 @@
         gap: 14px;
       }
 
+      .timeline {
+        display: grid;
+        gap: 14px;
+      }
+
+      .timeline-item {
+        display: grid;
+        grid-template-columns: 180px 1fr;
+        gap: 22px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+        padding: 22px;
+      }
+
+      .timeline-date {
+        color: var(--accent-strong);
+        font-size: 0.84rem;
+        font-weight: 850;
+      }
+
+      .timeline-item h3 {
+        margin-bottom: 8px;
+        font-size: 1.15rem;
+      }
+
+      .timeline-item p {
+        color: var(--muted);
+      }
+
       .work-item {
         display: grid;
         grid-template-columns: 180px 1fr;
@@ -458,6 +488,12 @@
         color: var(--text);
       }
 
+      .contact-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
       footer {
         width: min(1120px, calc(100% - 32px));
         margin: 0 auto;
@@ -483,7 +519,8 @@
 
         .hero-grid,
         .section-heading,
-        .work-item {
+        .work-item,
+        .timeline-item {
           grid-template-columns: 1fr;
         }
 
@@ -514,6 +551,7 @@
         }
 
         .hero-actions,
+        .contact-actions,
         .contact {
           align-items: stretch;
           flex-direction: column;
@@ -537,10 +575,11 @@
   <body>
     <header class="site-header">
       <nav class="nav" aria-label="主要ナビゲーション">
-        <a class="brand" href="#">ma-garin</a>
+        <a class="brand" href="#">Yuki Fujimagari</a>
         <div class="nav-links">
           <a href="#about">About</a>
           <a href="#skills">Skills</a>
+          <a href="#experience">Experience</a>
           <a href="#works">Works</a>
           <a href="#contact">Contact</a>
         </div>
@@ -551,14 +590,14 @@
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-grid">
           <div>
-            <p class="eyebrow">QA Engineer Portfolio</p>
-            <h1 id="hero-title">品質を、見える形にする。</h1>
+            <p class="eyebrow">Yuki Fujimagari / ma-garin</p>
+            <h1 id="hero-title">品質保証を、価値に接続する。</h1>
             <p class="lead">
-              ma-garin は、テスト設計・探索的テスト・自動化・ユーザー視点の検証を軸に、安心して使えるソフトウェアづくりを支えるQAエンジニアです。
+              エンタープライズ領域のモバイル・Webシステムを中心に、テスト自動化、アジャイル品質保証、プロジェクトマネジメントを横断して取り組むQAエンジニアです。
             </p>
             <div class="hero-actions">
-              <a class="button primary" href="#works">制作物を見る</a>
-              <a class="button secondary" href="https://github.com/ma-garin">GitHubを見る</a>
+              <a class="button primary" href="#experience">経歴を見る</a>
+              <a class="button secondary" href="https://www.wantedly.com/id/Yuki_Fujimagari">Wantedlyを見る</a>
             </div>
           </div>
 
@@ -589,16 +628,16 @@
               </div>
               <div class="metric-grid" aria-label="ポートフォリオの注力指標">
                 <div class="metric">
-                  <strong>01</strong>
-                  <span>公開実績を整理</span>
+                  <strong>10+</strong>
+                  <span>QA領域の経験年数</span>
                 </div>
                 <div class="metric">
-                  <strong>02</strong>
-                  <span>検証観点を明文化</span>
+                  <strong>PM</strong>
+                  <span>品質保証活動を推進</span>
                 </div>
                 <div class="metric">
-                  <strong>03</strong>
-                  <span>個人情報を最小化</span>
+                  <strong>Talk</strong>
+                  <span>登壇・発信実績</span>
                 </div>
               </div>
             </div>
@@ -611,9 +650,9 @@
           <div class="section-heading">
             <p class="section-kicker">01 / About</p>
             <div>
-              <h2 id="about-heading">ソフトウェアの不安を、検証と記録で減らす。</h2>
+              <h2 id="about-heading">難しいことはシンプルに。品質活動を前に進める。</h2>
               <p class="section-copy">
-                個人情報を広く公開せず、公開可能な制作物・学習記録・検証プロセスを中心にまとめています。QAとしての強みは、仕様理解、リスクの洗い出し、再現性のある報告、改善につながるフィードバックです。
+                第三者検証会社で組み込み機器の検証に携わった後、ベリサーブでモバイル・Webシステムの品質保証、テスト自動化、アジャイル開発支援に取り組んでいます。現在はITシステム事業部のプロジェクトマネージャとして、品質を事業価値につなげる活動を推進しています。
               </p>
             </div>
           </div>
@@ -625,40 +664,78 @@
           <div class="section-heading">
             <p class="section-kicker">02 / Skills</p>
             <div>
-              <h2 id="skills-heading">QAの見せ方をカテゴリで整理。</h2>
+              <h2 id="skills-heading">品質保証、テスト自動化、アジャイル支援を横断。</h2>
               <p class="section-copy">
-                参考にしたQAポートフォリオでは、スキルを単語で並べるだけでなく、どの品質課題に効くかまで分けて見せる構成が多く使われています。
+                Wantedlyで公開している経歴をもとに、実務の強みが伝わる粒度で整理しています。顧客情報や非公開案件の詳細は掲載せず、公開可能な専門性に絞っています。
               </p>
             </div>
           </div>
 
           <div class="cards">
             <article class="card">
-              <h3>Manual QA</h3>
-              <p>仕様確認、テスト観点整理、探索的テスト、回帰確認、バグ報告までを一連の品質活動として扱います。</p>
+              <h3>Quality Assurance</h3>
+              <p>組み込み機器、モバイル、Webシステムを対象に、品質リスクの整理から検証計画、改善提案までを扱います。</p>
               <ul class="tag-list">
-                <li>Test Design</li>
-                <li>Exploratory</li>
-                <li>Regression</li>
+                <li>Test Strategy</li>
+                <li>Risk Based QA</li>
+                <li>Enterprise</li>
               </ul>
             </article>
             <article class="card">
-              <h3>Automation</h3>
-              <p>繰り返し確認が必要な導線や重要フローを中心に、自動テスト化しやすい形へ整理します。</p>
+              <h3>Test Automation</h3>
+              <p>部門内の自動化ノウハウを集約し、組織へ展開する活動や、プロジェクト開始前の落とし穴を踏まえた支援に取り組んでいます。</p>
               <ul class="tag-list">
-                <li>Playwright</li>
-                <li>GitHub Actions</li>
-                <li>CI</li>
+                <li>Automation</li>
+                <li>Knowledge Sharing</li>
+                <li>Enablement</li>
               </ul>
             </article>
             <article class="card">
-              <h3>Quality Review</h3>
-              <p>UIの分かりやすさ、アクセシビリティ、表示崩れ、文言、エラー状態など、ユーザー体験の違和感を拾います。</p>
+              <h3>Agile Quality</h3>
+              <p>アジャイル開発に対する品質保証活動、優先順位付け、チームで成果を出すための活動設計を重視しています。</p>
               <ul class="tag-list">
-                <li>UX Review</li>
-                <li>Accessibility</li>
-                <li>Bug Report</li>
+                <li>Agile QA</li>
+                <li>Project Management</li>
+                <li>Value Driven</li>
               </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="experience" class="section" aria-labelledby="experience-heading">
+        <div class="section-inner">
+          <div class="section-heading">
+            <p class="section-kicker">03 / Experience</p>
+            <div>
+              <h2 id="experience-heading">QAエンジニアから、品質保証を推進するPMへ。</h2>
+              <p class="section-copy">
+                公開プロフィールに掲載されている範囲で、職務経験と登壇実績を要約しています。
+              </p>
+            </div>
+          </div>
+
+          <div class="timeline">
+            <article class="timeline-item">
+              <p class="timeline-date">2014 - 2017</p>
+              <div>
+                <h3>組み込み機器の検証業務</h3>
+                <p>第三者検証会社でQAエンジニアとして、複合機や周辺機器などのソフトウェア・ハードウェア検証に従事。サブリーダーとしてチームマネジメントも経験しました。</p>
+              </div>
+            </article>
+            <article class="timeline-item">
+              <p class="timeline-date">2017 - Present</p>
+              <div>
+                <h3>ベリサーブ / ITシステム事業部プロジェクトマネージャ</h3>
+                <p>エンタープライズ領域のモバイル・Webシステムを中心に、テスト自動化とアジャイル開発に対する品質保証活動を推進しています。</p>
+              </div>
+            </article>
+            <article class="timeline-item">
+              <p class="timeline-date">Speaking</p>
+              <div>
+                <h3>品質保証とテスト自動化に関する登壇</h3>
+                <p>JaSST 2022 東北、ITトレンドEXPO2024、ベリサーブ アカデミック イニシアティブ、テスト自動化関連セミナーなどで、品質重視のアジャイル開発やテスト自動化の知見を発信しています。</p>
+              </div>
             </article>
           </div>
         </div>
@@ -667,35 +744,35 @@
       <section id="works" class="section" aria-labelledby="works-heading">
         <div class="section-inner">
           <div class="section-heading">
-            <p class="section-kicker">03 / Works</p>
+            <p class="section-kicker">04 / Works</p>
             <div>
-              <h2 id="works-heading">公開できる成果物から、少しずつ積み上げる。</h2>
+              <h2 id="works-heading">公開実績と、今後整理していく成果物。</h2>
               <p class="section-copy">
-                実務情報や顧客情報は載せず、公開可能なサンプル、検証メモ、学習用プロジェクトを中心に掲載する方針です。
+                登壇・発信・公開可能な制作物を中心に掲載します。実務案件の詳細や顧客情報は扱いません。
               </p>
             </div>
           </div>
 
           <div class="work-list">
             <article class="work-item">
-              <p class="work-type">GitHub Pages</p>
+              <p class="work-type">Portfolio</p>
               <div>
                 <h3>QA Portfolio Website</h3>
-                <p>このポートフォリオサイトです。静的HTMLで構成し、GitHub Pagesで公開しています。個人情報を抑えながら、QAとしての観点と制作物への導線を見せる設計にしています。</p>
+                <p>このポートフォリオサイトです。GitHub Pagesで公開し、Wantedlyの公開プロフィールとGitHub上の活動をつなぐ入口として設計しています。</p>
               </div>
             </article>
             <article class="work-item">
-              <p class="work-type">Coming Soon</p>
+              <p class="work-type">Talk</p>
               <div>
-                <h3>Test Case Samples</h3>
-                <p>架空サービスを題材に、テスト観点表、テストケース、バグレポートのサンプルを公開予定です。</p>
+                <h3>品質重視のアジャイル開発</h3>
+                <p>金融業界やエンタープライズ領域における品質向上支援、アジャイル開発での品質保証活動について、公開イベントで登壇しています。</p>
               </div>
             </article>
             <article class="work-item">
-              <p class="work-type">Coming Soon</p>
+              <p class="work-type">Talk</p>
               <div>
-                <h3>Automation Practice</h3>
-                <p>Playwrightなどを使ったE2Eテストの練習プロジェクトを、CI結果と合わせて掲載予定です。</p>
+                <h3>テスト自動化の知見共有</h3>
+                <p>部門内の自動化ノウハウを集約し、社内外へ発信する取り組みや、プロジェクト開始前に知るべきテスト自動化の注意点を扱っています。</p>
               </div>
             </article>
           </div>
@@ -705,11 +782,11 @@
       <section class="section" aria-labelledby="principles-heading">
         <div class="section-inner">
           <div class="section-heading">
-            <p class="section-kicker">04 / Principles</p>
+            <p class="section-kicker">05 / Principles</p>
             <div>
               <h2 id="principles-heading">ポートフォリオで伝える品質観。</h2>
               <p class="section-copy">
-                QAエンジニアのページでは、ツール名だけでなく「何を大切にして検証するか」を短く示すと、読み手が強みを判断しやすくなります。
+                価値ドリブンで品質保証活動を考え、足し算だけでなく引き算も含めて優先順位を設計します。
               </p>
             </div>
           </div>
@@ -720,16 +797,16 @@
               <p>誰が見ても追える手順、期待結果、実際の結果を残します。</p>
             </article>
             <article class="principle">
-              <h3>リスク優先</h3>
-              <p>影響度が高い導線から検証し、限られた時間の価値を最大化します。</p>
+              <h3>価値ドリブン</h3>
+              <p>品質活動を目的化せず、事業やユーザーに届く価値から逆算します。</p>
             </article>
             <article class="principle">
-              <h3>ユーザー視点</h3>
-              <p>仕様通りかだけでなく、迷わず使えるか、失敗時に戻れるかを見ます。</p>
+              <h3>引き算の品質活動</h3>
+              <p>やることを増やすだけでなく、やらないことを決めて集中します。</p>
             </article>
             <article class="principle">
-              <h3>継続改善</h3>
-              <p>見つけた問題を、次のテスト設計や開発フロー改善につなげます。</p>
+              <h3>チームでの推進</h3>
+              <p>個人の知見をチームや組織に共有し、再現可能な活動へ変えます。</p>
             </article>
           </div>
         </div>
@@ -741,17 +818,20 @@
             <div>
               <h2 id="contact-heading">Connect</h2>
               <p>
-                連絡先は必要に応じて公開用アカウントへ集約します。まずはGitHub上の公開リポジトリから活動内容を確認できます。
+                詳しい職務経歴や公開実績はWantedlyにまとめています。GitHubでは公開できる制作物や学習記録を整理していきます。
               </p>
             </div>
-            <a class="button" href="https://github.com/ma-garin">GitHub Profile</a>
+            <div class="contact-actions">
+              <a class="button" href="https://www.wantedly.com/id/Yuki_Fujimagari">Wantedly Profile</a>
+              <a class="button" href="https://github.com/ma-garin">GitHub Profile</a>
+            </div>
           </div>
         </div>
       </section>
     </main>
 
     <footer>
-      <p>&copy; ma-garin. Built for GitHub Pages.</p>
+      <p>&copy; Yuki Fujimagari / ma-garin. Built for GitHub Pages.</p>
     </footer>
   </body>
 </html>
