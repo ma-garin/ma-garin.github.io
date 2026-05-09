@@ -9,7 +9,14 @@ https://ma-garin.github.io/
 ## 構成
 
 - `index.html`: トップページ
+- `about.html`: プロフィール
+- `capabilities.html`: 強み・専門性
+- `experience.html`: 職務経験・登壇実績
+- `works.html`: 公開実績
+- `principles.html`: 品質保証における考え方
+- `contact.html`: 公開プロフィールリンク
 - `404.html`: 存在しないURLにアクセスしたときのページ
+- `styles.css`: 共通スタイル
 - `.nojekyll`: GitHub PagesでJekyll処理を無効化するためのファイル
 
 ## 公開方針
@@ -21,7 +28,7 @@ https://ma-garin.github.io/
 
 ## 更新方法
 
-1. `index.html` を編集する
+1. 対象ページまたは `styles.css` を編集する
 2. ローカルで表示を確認する
 3. 変更をコミットして `main` に反映する
 

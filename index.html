@@ -5,541 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Yuki Fujimagari / ma-garinのQAエンジニア向けポートフォリオサイトです。">
     <title>Yuki Fujimagari | QA Portfolio</title>
-    <style>
-      :root {
-        color-scheme: light;
-        --bg: #edf5ff;
-        --bg-strong: #dbeafe;
-        --surface: #ffffff;
-        --surface-blue: #f4f8ff;
-        --text: #161616;
-        --muted: #525252;
-        --subtle: #6f6f6f;
-        --line: #d0e2ff;
-        --line-strong: #8ab6ff;
-        --blue: #0f62fe;
-        --blue-hover: #0043ce;
-        --blue-soft: #e0edff;
-        --cyan: #0072c3;
-        --green: #198038;
-        --yellow: #b28600;
-        --red: #da1e28;
-        --code: #262626;
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      html {
-        scroll-behavior: smooth;
-      }
-
-      body {
-        margin: 0;
-        background: var(--bg);
-        color: var(--text);
-        font-family: "IBM Plex Sans", "Helvetica Neue", Arial, system-ui, sans-serif;
-        line-height: 1.6;
-      }
-
-      a {
-        color: var(--blue);
-        text-decoration-thickness: 1px;
-        text-underline-offset: 0.18em;
-      }
-
-      h1,
-      h2,
-      h3,
-      p {
-        margin: 0;
-      }
-
-      .shell {
-        display: grid;
-        min-height: 100vh;
-        grid-template-columns: 272px minmax(0, 1fr);
-      }
-
-      .side {
-        position: sticky;
-        top: 0;
-        height: 100vh;
-        border-right: 1px solid var(--line);
-        background: #ffffff;
-        padding: 24px 20px;
-      }
-
-      .identity {
-        border-bottom: 1px solid var(--line);
-        padding-bottom: 24px;
-      }
-
-      .brand-mark {
-        display: grid;
-        width: 48px;
-        height: 48px;
-        place-items: center;
-        margin-bottom: 18px;
-        background: var(--blue);
-        color: #ffffff;
-        font-weight: 700;
-      }
-
-      .identity h1 {
-        font-size: 1.5rem;
-        line-height: 1.2;
-        letter-spacing: 0;
-      }
-
-      .identity p {
-        margin-top: 8px;
-        color: var(--muted);
-        font-size: 0.92rem;
-      }
-
-      .nav {
-        display: grid;
-        gap: 2px;
-        margin-top: 24px;
-      }
-
-      .nav a {
-        display: flex;
-        min-height: 40px;
-        align-items: center;
-        border-left: 3px solid transparent;
-        padding: 0 12px;
-        color: var(--text);
-        font-size: 0.92rem;
-        text-decoration: none;
-      }
-
-      .nav a:hover {
-        border-color: var(--blue);
-        background: var(--blue-soft);
-      }
-
-      .side-footer {
-        position: absolute;
-        right: 20px;
-        bottom: 24px;
-        left: 20px;
-        color: var(--subtle);
-        font-size: 0.8rem;
-      }
-
-      main {
-        min-width: 0;
-      }
-
-      .topbar {
-        display: flex;
-        min-height: 56px;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
-        border-bottom: 1px solid var(--line);
-        background: rgba(244, 248, 255, 0.92);
-        padding: 0 32px;
-        backdrop-filter: blur(12px);
-      }
-
-      .breadcrumb {
-        color: var(--muted);
-        font-size: 0.88rem;
-      }
-
-      .top-actions {
-        display: flex;
-        gap: 8px;
-      }
-
-      .button {
-        display: inline-flex;
-        min-height: 40px;
-        align-items: center;
-        justify-content: center;
-        border: 1px solid var(--blue);
-        padding: 8px 14px;
-        color: #ffffff;
-        background: var(--blue);
-        font-weight: 600;
-        text-decoration: none;
-      }
-
-      .button:hover {
-        background: var(--blue-hover);
-      }
-
-      .button.secondary {
-        border-color: var(--line-strong);
-        background: #ffffff;
-        color: var(--blue);
-      }
-
-      .button.secondary:hover {
-        background: var(--blue-soft);
-      }
-
-      .hero {
-        border-bottom: 1px solid var(--line);
-        background:
-          linear-gradient(90deg, rgba(15, 98, 254, 0.08), rgba(255, 255, 255, 0)),
-          var(--surface-blue);
-        padding: 56px 32px 36px;
-      }
-
-      .hero-grid {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(320px, 440px);
-        gap: 32px;
-        align-items: end;
-        max-width: 1180px;
-      }
-
-      .eyebrow {
-        margin-bottom: 14px;
-        color: var(--blue);
-        font-size: 0.82rem;
-        font-weight: 700;
-        text-transform: uppercase;
-      }
-
-      .hero h2 {
-        max-width: 760px;
-        font-size: 3.4rem;
-        font-weight: 400;
-        line-height: 1.05;
-        letter-spacing: 0;
-      }
-
-      .lead {
-        max-width: 720px;
-        margin-top: 20px;
-        color: var(--muted);
-        font-size: 1.08rem;
-      }
-
-      .hero-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 28px;
-      }
-
-      .status-panel {
-        border: 1px solid var(--line);
-        background: var(--surface);
-      }
-
-      .panel-header {
-        display: flex;
-        min-height: 44px;
-        align-items: center;
-        justify-content: space-between;
-        border-bottom: 1px solid var(--line);
-        padding: 0 16px;
-      }
-
-      .panel-title {
-        color: var(--text);
-        font-size: 0.86rem;
-        font-weight: 700;
-      }
-
-      .panel-tag {
-        color: var(--green);
-        font-size: 0.78rem;
-        font-weight: 700;
-      }
-
-      .panel-body {
-        padding: 16px;
-      }
-
-      .status-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1px;
-        background: var(--line);
-      }
-
-      .status-cell {
-        min-height: 104px;
-        background: #ffffff;
-        padding: 16px;
-      }
-
-      .status-cell span {
-        display: block;
-        color: var(--muted);
-        font-size: 0.78rem;
-      }
-
-      .status-cell strong {
-        display: block;
-        margin-top: 8px;
-        color: var(--text);
-        font-size: 1.5rem;
-        font-weight: 400;
-        line-height: 1.1;
-      }
-
-      .content {
-        padding: 0 32px 56px;
-      }
-
-      .section {
-        max-width: 1180px;
-        border-bottom: 1px solid var(--line);
-        padding: 48px 0;
-      }
-
-      .section-head {
-        display: grid;
-        grid-template-columns: 180px minmax(0, 1fr);
-        gap: 28px;
-        margin-bottom: 24px;
-      }
-
-      .section-number {
-        color: var(--blue);
-        font-size: 0.82rem;
-        font-weight: 700;
-      }
-
-      h3 {
-        font-size: 2rem;
-        font-weight: 400;
-        line-height: 1.2;
-        letter-spacing: 0;
-      }
-
-      .section-copy {
-        max-width: 760px;
-        margin-top: 10px;
-        color: var(--muted);
-      }
-
-      .card-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1px;
-        background: var(--line);
-        border: 1px solid var(--line);
-      }
-
-      .card {
-        min-height: 220px;
-        background: #ffffff;
-        padding: 20px;
-      }
-
-      .card h4 {
-        margin: 0 0 12px;
-        font-size: 1.08rem;
-        font-weight: 600;
-      }
-
-      .card p {
-        color: var(--muted);
-        font-size: 0.95rem;
-      }
-
-      .tags {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin: 18px 0 0;
-        padding: 0;
-        list-style: none;
-      }
-
-      .tags li {
-        background: var(--blue-soft);
-        padding: 4px 8px;
-        color: var(--code);
-        font-size: 0.78rem;
-        font-weight: 600;
-      }
-
-      .data-table {
-        border: 1px solid var(--line);
-        background: #ffffff;
-      }
-
-      .row {
-        display: grid;
-        grid-template-columns: 180px 1fr;
-        gap: 24px;
-        border-bottom: 1px solid var(--line);
-        padding: 18px 20px;
-      }
-
-      .row:last-child {
-        border-bottom: 0;
-      }
-
-      .row-key {
-        color: var(--blue);
-        font-size: 0.86rem;
-        font-weight: 700;
-      }
-
-      .row h4 {
-        margin: 0 0 6px;
-        font-size: 1rem;
-      }
-
-      .row p {
-        color: var(--muted);
-        font-size: 0.95rem;
-      }
-
-      .principles {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 1px;
-        border: 1px solid var(--line);
-        background: var(--line);
-      }
-
-      .principle {
-        min-height: 168px;
-        background: #ffffff;
-        padding: 18px;
-      }
-
-      .principle::before {
-        display: block;
-        width: 32px;
-        height: 4px;
-        margin-bottom: 18px;
-        background: var(--blue);
-        content: "";
-      }
-
-      .principle:nth-child(2)::before {
-        background: var(--cyan);
-      }
-
-      .principle:nth-child(3)::before {
-        background: var(--yellow);
-      }
-
-      .principle:nth-child(4)::before {
-        background: var(--green);
-      }
-
-      .principle h4 {
-        margin: 0 0 8px;
-        font-size: 1rem;
-      }
-
-      .principle p {
-        color: var(--muted);
-        font-size: 0.92rem;
-      }
-
-      .contact-panel {
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 24px;
-        border: 1px solid var(--line);
-        background: #ffffff;
-        padding: 24px;
-      }
-
-      .contact-panel p {
-        max-width: 720px;
-        margin-top: 8px;
-        color: var(--muted);
-      }
-
-      .contact-actions {
-        display: flex;
-        flex-wrap: wrap;
-        align-content: start;
-        gap: 8px;
-      }
-
-      footer {
-        border-top: 1px solid var(--line);
-        padding: 24px 32px;
-        color: var(--subtle);
-        font-size: 0.84rem;
-      }
-
-      @media (max-width: 960px) {
-        .shell {
-          grid-template-columns: 1fr;
-        }
-
-        .side {
-          position: static;
-          height: auto;
-          border-right: 0;
-          border-bottom: 1px solid var(--line);
-        }
-
-        .side-footer {
-          position: static;
-          margin-top: 24px;
-        }
-
-        .hero-grid,
-        .section-head,
-        .contact-panel {
-          grid-template-columns: 1fr;
-        }
-
-        .card-grid,
-        .principles {
-          grid-template-columns: 1fr 1fr;
-        }
-      }
-
-      @media (max-width: 640px) {
-        .topbar {
-          align-items: flex-start;
-          flex-direction: column;
-          padding: 14px 16px;
-        }
-
-        .hero,
-        .content {
-          padding-right: 16px;
-          padding-left: 16px;
-        }
-
-        .hero h2 {
-          font-size: 2.35rem;
-        }
-
-        h3 {
-          font-size: 1.55rem;
-        }
-
-        .status-grid,
-        .card-grid,
-        .principles,
-        .row {
-          grid-template-columns: 1fr;
-        }
-
-        .top-actions,
-        .hero-actions,
-        .contact-actions {
-          width: 100%;
-        }
-
-        .button {
-          width: 100%;
-        }
-      }
-    </style>
+    <link rel="stylesheet" href="styles.css">
   </head>
   <body>
     <div class="shell">
@@ -550,26 +16,27 @@
           <p>QA Engineer / Project Manager</p>
         </div>
         <nav class="nav" aria-label="主要ナビゲーション">
-          <a href="#overview">Overview</a>
-          <a href="#capabilities">Capabilities</a>
-          <a href="#experience">Experience</a>
-          <a href="#works">Public work</a>
-          <a href="#principles">Principles</a>
-          <a href="#contact">Contact</a>
+          <a class="active" href="index.html">Overview</a>
+          <a href="about.html">About</a>
+          <a href="capabilities.html">Capabilities</a>
+          <a href="experience.html">Experience</a>
+          <a href="works.html">Public work</a>
+          <a href="principles.html">Principles</a>
+          <a href="contact.html">Contact</a>
         </nav>
         <p class="side-footer">QA portfolio built on GitHub Pages</p>
       </aside>
 
       <main>
         <div class="topbar">
-          <p class="breadcrumb">Portfolio / Quality assurance / ma-garin</p>
+          <p class="breadcrumb">Portfolio / Overview / ma-garin</p>
           <div class="top-actions">
             <a class="button secondary" href="https://github.com/ma-garin">GitHub</a>
             <a class="button" href="https://www.wantedly.com/id/Yuki_Fujimagari">Wantedly</a>
           </div>
         </div>
 
-        <section id="overview" class="hero" aria-labelledby="hero-title">
+        <section class="hero" aria-labelledby="hero-title">
           <div class="hero-grid">
             <div>
               <p class="eyebrow">Quality assurance portfolio</p>
@@ -578,8 +45,8 @@
                 エンタープライズ領域のモバイル・Webシステムを中心に、テスト自動化、アジャイル品質保証、プロジェクトマネジメントを横断して取り組むQAエンジニアです。
               </p>
               <div class="hero-actions">
-                <a class="button" href="#experience">経歴を見る</a>
-                <a class="button secondary" href="#capabilities">強みを見る</a>
+                <a class="button" href="experience.html">経歴を見る</a>
+                <a class="button secondary" href="capabilities.html">強みを見る</a>
               </div>
             </div>
 
@@ -613,167 +80,42 @@
         </section>
 
         <div class="content">
-          <section class="section" aria-labelledby="about-heading">
+          <section class="section" aria-labelledby="overview-heading">
             <div class="section-head">
-              <p class="section-number">01 / About</p>
+              <p class="section-number">Overview</p>
               <div>
-                <h3 id="about-heading">難しいことはシンプルに。品質活動を前に進める。</h3>
+                <h3 id="overview-heading">QAの専門性をページ単位で整理。</h3>
                 <p class="section-copy">
-                  第三者検証会社で組み込み機器の検証に携わった後、ベリサーブでモバイル・Webシステムの品質保証、テスト自動化、アジャイル開発支援に取り組んでいます。現在はITシステム事業部のプロジェクトマネージャとして、品質を事業価値につなげる活動を推進しています。
-                </p>
-              </div>
-            </div>
-          </section>
-
-          <section id="capabilities" class="section" aria-labelledby="capabilities-heading">
-            <div class="section-head">
-              <p class="section-number">02 / Capabilities</p>
-              <div>
-                <h3 id="capabilities-heading">品質保証、テスト自動化、アジャイル支援を横断。</h3>
-                <p class="section-copy">
-                  Wantedlyで公開している経歴をもとに、実務の強みが伝わる粒度で整理しています。顧客情報や非公開案件の詳細は掲載せず、公開可能な専門性に絞っています。
+                  1ページ内の長いスクロールではなく、プロフィール、強み、経歴、公開実績、品質観、連絡先を独立ページとして分けています。
                 </p>
               </div>
             </div>
 
             <div class="card-grid">
               <article class="card">
-                <h4>Quality Assurance</h4>
-                <p>組み込み機器、モバイル、Webシステムを対象に、品質リスクの整理から検証計画、改善提案までを扱います。</p>
+                <h4>About</h4>
+                <p>これまでの品質保証活動と現在の役割をまとめています。</p>
                 <ul class="tags">
-                  <li>Test strategy</li>
-                  <li>Risk based QA</li>
-                  <li>Enterprise</li>
+                  <li>Profile</li>
+                  <li>QA</li>
                 </ul>
               </article>
               <article class="card">
-                <h4>Test Automation</h4>
-                <p>部門内の自動化ノウハウを集約し、組織へ展開する活動や、プロジェクト開始前の落とし穴を踏まえた支援に取り組んでいます。</p>
+                <h4>Capabilities</h4>
+                <p>品質保証、テスト自動化、アジャイル支援の強みを整理しています。</p>
                 <ul class="tags">
                   <li>Automation</li>
-                  <li>Enablement</li>
-                  <li>Knowledge sharing</li>
+                  <li>Agile QA</li>
                 </ul>
               </article>
               <article class="card">
-                <h4>Agile Quality</h4>
-                <p>アジャイル開発に対する品質保証活動、優先順位付け、チームで成果を出すための活動設計を重視しています。</p>
+                <h4>Experience</h4>
+                <p>公開プロフィールに基づく職務経験と登壇実績を掲載しています。</p>
                 <ul class="tags">
-                  <li>Agile QA</li>
-                  <li>Project management</li>
-                  <li>Value driven</li>
+                  <li>Career</li>
+                  <li>Talks</li>
                 </ul>
               </article>
-            </div>
-          </section>
-
-          <section id="experience" class="section" aria-labelledby="experience-heading">
-            <div class="section-head">
-              <p class="section-number">03 / Experience</p>
-              <div>
-                <h3 id="experience-heading">QAエンジニアから、品質保証を推進するPMへ。</h3>
-                <p class="section-copy">公開プロフィールに掲載されている範囲で、職務経験と登壇実績を要約しています。</p>
-              </div>
-            </div>
-
-            <div class="data-table">
-              <article class="row">
-                <p class="row-key">2014 - 2017</p>
-                <div>
-                  <h4>組み込み機器の検証業務</h4>
-                  <p>第三者検証会社でQAエンジニアとして、複合機や周辺機器などのソフトウェア・ハードウェア検証に従事。サブリーダーとしてチームマネジメントも経験しました。</p>
-                </div>
-              </article>
-              <article class="row">
-                <p class="row-key">2017 - Present</p>
-                <div>
-                  <h4>ベリサーブ / ITシステム事業部プロジェクトマネージャ</h4>
-                  <p>エンタープライズ領域のモバイル・Webシステムを中心に、テスト自動化とアジャイル開発に対する品質保証活動を推進しています。</p>
-                </div>
-              </article>
-              <article class="row">
-                <p class="row-key">Speaking</p>
-                <div>
-                  <h4>品質保証とテスト自動化に関する登壇</h4>
-                  <p>JaSST 2022 東北、ITトレンドEXPO2024、ベリサーブ アカデミック イニシアティブ、テスト自動化関連セミナーなどで、品質重視のアジャイル開発やテスト自動化の知見を発信しています。</p>
-                </div>
-              </article>
-            </div>
-          </section>
-
-          <section id="works" class="section" aria-labelledby="works-heading">
-            <div class="section-head">
-              <p class="section-number">04 / Public work</p>
-              <div>
-                <h3 id="works-heading">公開実績と、今後整理していく成果物。</h3>
-                <p class="section-copy">登壇・発信・公開可能な制作物を中心に掲載します。実務案件の詳細や顧客情報は扱いません。</p>
-              </div>
-            </div>
-
-            <div class="data-table">
-              <article class="row">
-                <p class="row-key">Portfolio</p>
-                <div>
-                  <h4>QA Portfolio Website</h4>
-                  <p>このポートフォリオサイトです。GitHub Pagesで公開し、Wantedlyの公開プロフィールとGitHub上の活動をつなぐ入口として設計しています。</p>
-                </div>
-              </article>
-              <article class="row">
-                <p class="row-key">Talk</p>
-                <div>
-                  <h4>品質重視のアジャイル開発</h4>
-                  <p>金融業界やエンタープライズ領域における品質向上支援、アジャイル開発での品質保証活動について、公開イベントで登壇しています。</p>
-                </div>
-              </article>
-              <article class="row">
-                <p class="row-key">Talk</p>
-                <div>
-                  <h4>テスト自動化の知見共有</h4>
-                  <p>部門内の自動化ノウハウを集約し、社内外へ発信する取り組みや、プロジェクト開始前に知るべきテスト自動化の注意点を扱っています。</p>
-                </div>
-              </article>
-            </div>
-          </section>
-
-          <section id="principles" class="section" aria-labelledby="principles-heading">
-            <div class="section-head">
-              <p class="section-number">05 / Principles</p>
-              <div>
-                <h3 id="principles-heading">価値から逆算し、やらないことも決める。</h3>
-                <p class="section-copy">価値ドリブンで品質保証活動を考え、足し算だけでなく引き算も含めて優先順位を設計します。</p>
-              </div>
-            </div>
-
-            <div class="principles">
-              <article class="principle">
-                <h4>再現性</h4>
-                <p>誰が見ても追える手順、期待結果、実際の結果を残します。</p>
-              </article>
-              <article class="principle">
-                <h4>価値ドリブン</h4>
-                <p>品質活動を目的化せず、事業やユーザーに届く価値から逆算します。</p>
-              </article>
-              <article class="principle">
-                <h4>引き算の品質活動</h4>
-                <p>やることを増やすだけでなく、やらないことを決めて集中します。</p>
-              </article>
-              <article class="principle">
-                <h4>チームでの推進</h4>
-                <p>個人の知見をチームや組織に共有し、再現可能な活動へ変えます。</p>
-              </article>
-            </div>
-          </section>
-
-          <section id="contact" class="section" aria-labelledby="contact-heading">
-            <div class="contact-panel">
-              <div>
-                <h3 id="contact-heading">Connect</h3>
-                <p>詳しい職務経歴や公開実績はWantedlyにまとめています。GitHubでは公開できる制作物や学習記録を整理していきます。</p>
-              </div>
-              <div class="contact-actions">
-                <a class="button" href="https://www.wantedly.com/id/Yuki_Fujimagari">Wantedly Profile</a>
-                <a class="button secondary" href="https://github.com/ma-garin">GitHub Profile</a>
-              </div>
             </div>
           </section>
         </div>
