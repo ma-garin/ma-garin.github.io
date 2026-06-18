@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>システム・ツール説明資料 5枚テンプレート集</title>
+<style>
+:root{--bg:#f7f8fb;--ink:#1f2937;--muted:#667085;--line:#d9dee8;--nav:#0f172a;--accent:#1f4e79;--soft:#edf2f7;--warn:#8a5a00;--ok:#14532d;}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Meiryo,"Yu Gothic",sans-serif;line-height:1.55} 
+header{position:sticky;top:0;background:rgba(247,248,251,.95);border-bottom:1px solid var(--line);z-index:10;padding:14px 24px;display:flex;gap:18px;align-items:center;justify-content:space-between}
+header h1{font-size:18px;margin:0;font-weight:700}.nav{display:flex;gap:8px;flex-wrap:wrap}.nav a{font-size:12px;text-decoration:none;color:#fff;background:var(--nav);padding:7px 10px;border-radius:999px}
+main{max-width:1180px;margin:0 auto;padding:24px}.intro{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;margin-bottom:22px}.intro h2{margin:0 0 10px;font-size:24px}.intro p{margin:6px 0;color:var(--muted)}
+.pattern{margin:34px 0 54px}.pattern-title{display:flex;align-items:flex-end;justify-content:space-between;border-bottom:3px solid var(--accent);padding-bottom:10px;margin-bottom:16px}.pattern-title h2{font-size:26px;margin:0}.pattern-title .use{font-size:14px;color:var(--muted);max-width:520px;text-align:right}
+.deck{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}.slide{background:#fff;border:1px solid var(--line);border-radius:16px;min-height:520px;padding:17px;box-shadow:0 3px 12px rgba(15,23,42,.06);position:relative}.num{font-size:12px;color:#fff;background:var(--accent);display:inline-block;padding:3px 8px;border-radius:6px;margin-bottom:10px}.slide h3{font-size:18px;line-height:1.25;margin:0 0 8px}.lead{font-size:14px;font-weight:700;color:#111827;border-left:4px solid var(--accent);padding-left:8px;margin:10px 0 12px}.box{border-top:1px solid var(--line);padding-top:9px;margin-top:9px}.box b{font-size:12px;color:var(--accent);display:block;margin-bottom:4px}.box ul{padding-left:17px;margin:4px 0}.box li{font-size:12.5px;margin:3px 0}.avoid{position:absolute;bottom:14px;left:17px;right:17px;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:8px;font-size:11.5px;color:#7c2d12}.meta{font-size:12px;color:var(--muted);margin:6px 0 0}.principles{display:grid;grid-template-columns:1.2fr 1fr;gap:16px}.panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px}.panel h3{margin-top:0}.panel table{width:100%;border-collapse:collapse;font-size:13px}.panel th,.panel td{border-bottom:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}.tag{font-size:11px;border:1px solid var(--line);border-radius:999px;padding:3px 8px;color:var(--muted);display:inline-block;margin:2px}.decision{background:#f0fdf4;border-color:#bbf7d0}.risk{background:#fffbeb;border-color:#fde68a}.sources{font-size:12px;color:var(--muted)}
+@media print{header{display:none} main{padding:0}.deck{page-break-after:always}.slide{break-inside:avoid;box-shadow:none}.pattern{page-break-after:always}.intro,.panel{box-shadow:none}.avoid{position:static;margin-top:10px}}
+@media(max-width:1100px){.deck{grid-template-columns:1fr}.slide{min-height:auto}.avoid{position:static;margin-top:10px}.principles{grid-template-columns:1fr}.pattern-title{display:block}.pattern-title .use{text-align:left;margin-top:8px}}
+</style>
+</head>
+<body>
+<header><h1>システム・ツール説明資料：5枚テンプレート集</h1><nav class="nav"><a href="#common">共通原則</a><a href="#a">A 決裁獲得</a><a href="#b">B 製品説明</a><a href="#c">C 変革提案</a><a href="#d">D 投資判断</a></nav></header>
+<main>
+<section class="intro" id="common">
+<h2>上位者向けの5枚は「機能紹介」ではなく「判断資料」に寄せる</h2>
+<p>部長・本部長以上は、細かい機能よりも「なぜ今やるか」「事業・組織に何が効くか」「どれだけの投資で、どのリスクを取り、何を決めればよいか」を見ます。</p>
+<div class="principles">
+<div class="panel">
+<h3>共通で必ず入れる要素</h3>
+<table><tr><th>要素</th><th>書く内容</th></tr><tr><td>1. Executive ask</td><td>承認してほしいこと。PoC継続、部署展開、予算、人員、標準化など。</td></tr><tr><td>2. Business pain</td><td>現場課題ではなく、管理職が困る形に変換。工数、品質、遅延、属人化、監査、再現性。</td></tr><tr><td>3. Value case</td><td>削減工数、品質向上、リードタイム短縮、教育効果、案件横展開性。</td></tr><tr><td>4. Differentiation</td><td>既存ツール・Excel・人手運用と何が違うか。自社業務ナレッジとの結合が重要。</td></tr><tr><td>5. Operating model</td><td>誰が使い、誰が承認し、誰が保守し、どこまでAI/自動化に任せるか。</td></tr></table>
+</div>
+<div class="panel">
+<h3>5枚制約で捨てるもの</h3>
+<p><span class="tag">画面キャプ大量</span><span class="tag">技術スタック詳細</span><span class="tag">全機能一覧</span><span class="tag">開発苦労話</span><span class="tag">抽象的なAI活用</span></p>
+<p>画面は1〜2枚で十分です。詳細は別紙・デモ・FAQに逃がし、5枚本体は意思決定に寄せます。</p>
+</div>
+</div>
+</section>
+
+<section class="pattern" id="a">
+<div class="pattern-title"><h2>A. 決裁獲得型：一番汎用的</h2><div class="use">対象：部長・本部長に「次の投資／展開判断」を求めるとき。複数ツールの説明資料にも最適。</div></div>
+<div class="deck">
+<article class="slide"><span class="num">1/5</span><h3>この資料で決めてほしいこと</h3><div class="lead">◯◯ツールを、△△部門で標準利用に進めたい。</div><div class="box"><b>書くこと</b><ul><li>対象ツール名と一文概要</li><li>意思決定事項：予算／人員／利用部門／期間</li><li>なぜ今判断が必要か</li></ul></div><div class="box"><b>例</b><ul><li>PMO業務の報告・リスク抽出を半自動化</li><li>3か月PoC後、2案件へ横展開</li></ul></div><div class="avoid">NG：ツールの特徴から入り、何を承認してほしいか不明。</div></article>
+<article class="slide"><span class="num">2/5</span><h3>現状課題と経営影響</h3><div class="lead">課題は「便利にしたい」ではなく「管理不能コストを下げる」。</div><div class="box"><b>書くこと</b><ul><li>現在の業務フローとボトルネック</li><li>影響：工数、品質、遅延、属人化、監査性</li><li>放置時の損失</li></ul></div><div class="box"><b>数値の置き方</b><ul><li>月◯hの定型作業</li><li>レビュー漏れ◯件/月</li><li>新人立上げ◯週間</li></ul></div><div class="avoid">NG：現場の不満だけ。上位者のKPIに翻訳する。</div></article>
+<article class="slide"><span class="num">3/5</span><h3>解決策：ツールの役割と適用範囲</h3><div class="lead">ツールが業務のどこを置き換え、どこを人が担保するかを示す。</div><div class="box"><b>書くこと</b><ul><li>入力：チケット、議事録、仕様、テストケース等</li><li>処理：抽出、分類、生成、比較、レビュー</li><li>出力：報告書、観点表、リスク一覧、改善提案</li><li>Human in the Loopの位置</li></ul></div><div class="box"><b>必須表現</b><ul><li>AI判断ではなく「AI補助＋人間承認」</li><li>対象外も明記</li></ul></div><div class="avoid">NG：AIが何でもやる表現。責任分界が曖昧。</div></article>
+<article class="slide"><span class="num">4/5</span><h3>期待効果と投資対効果</h3><div class="lead">効果は「時間削減」だけでなく、再現性・横展開性まで入れる。</div><div class="box"><b>書くこと</b><ul><li>定量効果：工数、リードタイム、欠陥流出、教育期間</li><li>定性効果：属人化低減、標準化、ナレッジ蓄積</li><li>必要コスト：開発、運用、教育、レビュー体制</li></ul></div><div class="box"><b>式</b><ul><li>月間削減h × 人件費単価 × 対象案件数</li><li>初期費＋運用費との差分</li></ul></div><div class="avoid">NG：夢の効果だけ。前提・計算式・不確実性を明記。</div></article>
+<article class="slide"><span class="num">5/5</span><h3>リスク・体制・次アクション</h3><div class="lead">承認者が安心してYes/Noできる状態にする。</div><div class="box"><b>書くこと</b><ul><li>主要リスク：精度、情報管理、運用定着、保守</li><li>対策：レビュー、ログ、権限、評価指標</li><li>体制：Owner、運用責任者、利用部門</li><li>次の90日計画</li></ul></div><div class="box decision"><b>最後の一文</b><ul><li>本日は「PoC継続／部門展開／予算化」の承認をお願いします。</li></ul></div><div class="avoid">NG：最後が「以上です」。必ずDecisionに戻す。</div></article>
+</div></section>
+
+<section class="pattern" id="b">
+<div class="pattern-title"><h2>B. ベンダー提案型：社内外に製品として見せる</h2><div class="use">対象：自作ツールを“製品・サービス”として説明する場合。営業資料・社内横展開に強い。</div></div>
+<div class="deck">
+<article class="slide"><span class="num">1/5</span><h3>誰の、どの業務を変えるツールか</h3><div class="lead">ペルソナと業務ジョブを先に置く。</div><div class="box"><b>書くこと</b><ul><li>対象ユーザー：PMO、QAリーダー、テスト設計者等</li><li>利用シーン：朝会前、レビュー前、報告前</li><li>現行代替：Excel、手作業、属人ノウハウ</li></ul></div><div class="avoid">NG：機能名の羅列から始める。</div></article>
+<article class="slide"><span class="num">2/5</span><h3>提供価値：Before / After</h3><div class="lead">導入後の業務状態を比較で見せる。</div><div class="box"><b>書くこと</b><ul><li>Before：時間がかかる、属人化、レビュー漏れ</li><li>After：標準化、即時生成、監査可能、再利用可能</li><li>成果物の変化：報告書、観点、リスク、ログ</li></ul></div><div class="avoid">NG：画面の便利さだけを語る。</div></article>
+<article class="slide"><span class="num">3/5</span><h3>主要機能と差別化</h3><div class="lead">機能は3〜5個に絞り、既存手段との差分を書く。</div><div class="box"><b>書くこと</b><ul><li>機能1：入力収集</li><li>機能2：AI/ルール分析</li><li>機能3：成果物生成</li><li>機能4：レビュー・承認</li><li>差別化：自社QA/PMOナレッジ内蔵</li></ul></div><div class="avoid">NG：全機能一覧。上位者は覚えきれない。</div></article>
+<article class="slide"><span class="num">4/5</span><h3>導入モデルと運用設計</h3><div class="lead">製品は「使える」だけでなく「運用できる」ことが重要。</div><div class="box"><b>書くこと</b><ul><li>導入ステップ：試行→標準化→横展開</li><li>教育：30分説明、テンプレ、FAQ</li><li>運用：問い合わせ、改修受付、評価会</li><li>権限・データ管理</li></ul></div><div class="avoid">NG：作った後の運用責任者が不明。</div></article>
+<article class="slide"><span class="num">5/5</span><h3>価格・コスト・スケール余地</h3><div class="lead">社内でも外販でも、継続コストと展開余地を示す。</div><div class="box"><b>書くこと</b><ul><li>初期費、月額運用、AI/API、保守工数</li><li>利用単位：案件、部門、ユーザー</li><li>展開先候補：類似案件、他課、顧客支援</li><li>判断：継続投資／横展開／凍結</li></ul></div><div class="avoid">NG：コストを隠す。上位者ほど先に気にする。</div></article>
+</div></section>
+
+<section class="pattern" id="c">
+<div class="pattern-title"><h2>C. 戦略コンサル型：単体ツールではなく変革テーマとして見せる</h2><div class="use">対象：AI推進、標準化、品質変革、PMO高度化など、複数ツールを束ねる説明。</div></div>
+<div class="deck">
+<article class="slide"><span class="num">1/5</span><h3>戦略テーマとの接続</h3><div class="lead">このツール群は、部門戦略のどの課題を解くのか。</div><div class="box"><b>書くこと</b><ul><li>中計・部門課題との接続</li><li>AI活用、品質、生産性、人材育成の位置づけ</li><li>なぜ個別改善でなく仕組み化が必要か</li></ul></div><div class="avoid">NG：個人の開発成果紹介に見える。</div></article>
+<article class="slide"><span class="num">2/5</span><h3>ツール群のポートフォリオ</h3><div class="lead">複数ツールを業務チェーン上に配置する。</div><div class="box"><b>書くこと</b><ul><li>企画・要件・設計・テスト・PMO・ナレッジのどこに効くか</li><li>短期効果／中期効果／長期資産化</li><li>重複・依存関係・統合余地</li></ul></div><div class="avoid">NG：ツールを横並びで紹介して終わる。</div></article>
+<article class="slide"><span class="num">3/5</span><h3>Target Operating Model</h3><div class="lead">人・AI・プロセス・データの役割分担を描く。</div><div class="box"><b>書くこと</b><ul><li>人：判断、承認、例外対応</li><li>AI：抽出、要約、生成、候補提示</li><li>プロセス：レビュー、標準テンプレ、評価会</li><li>データ：案件ナレッジ、成果物、ログ</li></ul></div><div class="avoid">NG：ツール導入だけで組織が変わる前提。</div></article>
+<article class="slide"><span class="num">4/5</span><h3>3段階ロードマップ</h3><div class="lead">Discover → Pilot → Scale の順で無理なく進める。</div><div class="box"><b>書くこと</b><ul><li>0〜3か月：代表案件で検証</li><li>3〜6か月：標準プロセス化</li><li>6〜12か月：横展開・教育・運用組織化</li><li>各段階のゲート条件</li></ul></div><div class="avoid">NG：いきなり全社展開。失敗時の撤退基準も必要。</div></article>
+<article class="slide"><span class="num">5/5</span><h3>成果指標・ガバナンス・要求事項</h3><div class="lead">変革テーマはKPIとガバナンスがないと曖昧になる。</div><div class="box"><b>書くこと</b><ul><li>KPI：削減工数、利用率、成果物品質、横展開数</li><li>会議体：月次評価、リスクレビュー、改善Backlog</li><li>要求：Owner任命、対象案件選定、時間確保</li></ul></div><div class="avoid">NG：熱意で終える。運営設計まで示す。</div></article>
+</div></section>
+
+<section class="pattern" id="d">
+<div class="pattern-title"><h2>D. 投資判断型：残す・伸ばす・捨てるを決める</h2><div class="use">対象：多数の自作ツールから、どれを正式化するか判断してもらう場合。</div></div>
+<div class="deck">
+<article class="slide"><span class="num">1/5</span><h3>投資仮説</h3><div class="lead">このツールに投資する理由を1行で言う。</div><div class="box"><b>書くこと</b><ul><li>どの未充足ニーズを狙うか</li><li>なぜ既存手段では不十分か</li><li>勝ち筋：業務知見、データ、運用定着</li></ul></div><div class="avoid">NG：作ったから使ってほしい。</div></article>
+<article class="slide"><span class="num">2/5</span><h3>需要と適用可能性</h3><div class="lead">利用者数よりも「横展開できる同型業務」が重要。</div><div class="box"><b>書くこと</b><ul><li>対象案件数、対象ロール、発生頻度</li><li>社内外の類似ニーズ</li><li>利用条件：入力データ、権限、環境制約</li></ul></div><div class="avoid">NG：需要を感覚で書く。最低限の根拠を置く。</div></article>
+<article class="slide"><span class="num">3/5</span><h3>競合・代替手段との差</h3><div class="lead">Excel・既存SaaS・人手運用・外注と比較する。</div><div class="box"><b>書くこと</b><ul><li>代替手段の限界</li><li>自作である必要性</li><li>模倣されにくい要素</li><li>内製継続のリスク</li></ul></div><div class="avoid">NG：競合未確認のまま「独自」と言う。</div></article>
+<article class="slide"><span class="num">4/5</span><h3>事業性・実装性スコア</h3><div class="lead">感情ではなく、同じ物差しで比較する。</div><div class="box"><b>評価軸</b><ul><li>経営価値：高/中/低</li><li>再利用性：案件横展開できるか</li><li>実装難度：低いほど短期展開</li><li>運用負荷：保守できるか</li><li>リスク：情報管理・精度・責任</li></ul></div><div class="avoid">NG：全ツールを同じ熱量で推す。</div></article>
+<article class="slide"><span class="num">5/5</span><h3>Go / Hold / Kill 判断</h3><div class="lead">最後は意思決定テーブルにする。</div><div class="box"><b>書くこと</b><ul><li>Go：正式化・予算化</li><li>Hold：検証継続、条件付き</li><li>Kill：中止・部品化・知見のみ保存</li><li>次回レビュー時点と判定条件</li></ul></div><div class="avoid">NG：全部継続。リソース配分にならない。</div></article>
+</div></section>
+
+<section class="intro">
+<h2>推奨の使い分け</h2>
+<div class="principles">
+<div class="panel"><h3>単体ツールを説明するなら</h3><p>まずは <b>A. 決裁獲得型</b>。上位者向けに最も通りやすい構成です。製品感を出す場合だけBへ寄せます。</p></div>
+<div class="panel"><h3>複数ツールをまとめるなら</h3><p><b>C. 戦略コンサル型</b>で全体像を作り、各ツールは別紙1枚に分けます。投資優先順位を決める場ではDを使います。</p></div>
+</div>
+<p class="sources">参考視点：McKinseyのデジタル変革/AI価値創出、BCGのデジタル変革、Deloitteの変革ロードマップ、Gartnerの変革ストーリー/リスクガバナンス、KPMGのTarget Operating Model/ガバナンス。</p>
+</section>
+</main>
+</body></html>
