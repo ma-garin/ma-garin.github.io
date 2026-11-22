@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>金額シミュレーション</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text-1);
+      min-height: 100vh;
+      padding: 0 12px 80px;
+    }
+
+    .container { max-width: 500px; margin: auto; }
+
+    header {
+      text-align: center;
+      padding: 18px 4px 14px;
+      border-bottom: 1px solid var(--divider);
+      margin-bottom: 16px;
+    }
+    header h1 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 0.06em;
+    }
+    header .subtitle {
+      font-size: 0.72rem;
+      color: var(--text-2);
+      letter-spacing: 0.12em;
+      margin-top: 4px;
+    }
+
+    /* カード */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+    }
+    .card-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-2);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--divider);
+    }
+
+    /* 合計金額表示 */
+    #sim-total-card {
+      background: var(--primary-cont);
+      text-align: center;
+      padding: 22px 16px 18px;
+    }
+    #sim-total-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      color: var(--primary-txt);
+      opacity: 0.8;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    #simulation_grand_total {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--primary-txt);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    #simulation_grand_total span { font-size: 1.2rem; margin-left: 4px; opacity: 0.8; }
+
+    /* 滞在時間コントロール */
+    .time-display {
+      font-size: 3.5rem;
+      font-weight: 700;
+      color: var(--text-1);
+      text-align: center;
+      letter-spacing: 0.05em;
+      margin-bottom: 14px;
+      font-variant-numeric: tabular-nums;
+    }
+    .time-sub {
+      font-size: 0.72rem;
+      color: var(--text-2);
+      text-align: center;
+      margin-top: -10px;
+      margin-bottom: 14px;
+      letter-spacing: 0.15em;
+    }
+    .time-control-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+    }
+    .btn {
+      padding: 11px 8px;
+      border: 1px solid var(--outline);
+      border-radius: var(--radius);
+      font-family: var(--font);
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.02em;
+    }
+    .btn-primary { background: var(--primary); color: var(--primary-on); border-color: var(--primary); }
+    .btn-primary:hover { opacity: 0.88; }
+    .btn-ghost { background: transparent; color: var(--text-1); }
+    .btn-ghost:hover { background: var(--primary-dim); border-color: rgba(130,170,204,0.35); }
+    .btn-danger { background: transparent; color: var(--error); border-color: rgba(242,139,130,0.4); }
+    .btn-danger:hover { background: rgba(242,139,130,0.12); }
+
+    /* セット数表示バッジ */
+    .set-info {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--divider);
+    }
+    .set-info-label { font-size: 0.75rem; color: var(--text-2); }
+    .set-badge {
+      display: inline-block;
+      background: var(--primary-dim);
+      border: 1px solid rgba(130,170,204,0.4);
+      color: var(--primary);
+      border-radius: var(--radius);
+      padding: 3px 16px;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    /* ドリンクテーブル */
+    .drink-table { width: 100%; border-collapse: collapse; }
+    .drink-table thead th {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-2);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 4px 6px 10px;
+      text-align: center;
+      border-bottom: 1px solid var(--divider);
+    }
+    .drink-table thead th:first-child { text-align: left; }
+    .drink-table tbody tr {
+      border-bottom: 1px solid var(--divider);
+      transition: background 0.15s;
+    }
+    .drink-table tbody tr:hover { background: rgba(255,255,255,0.04); }
+    .drink-table tbody tr:last-child { border-bottom: none; }
+    .drink-table td {
+      padding: 10px 6px;
+      font-size: 0.87rem;
+      text-align: center;
+      vertical-align: middle;
+    }
+    .drink-table td:first-child { text-align: left; font-weight: 700; }
+    .drink-table .price-col { color: var(--text-2); font-size: 0.8rem; }
+    .drink-table .total-col { color: var(--primary); font-weight: 700; font-size: 0.87rem; }
+    .drink-table .total-col.zero { color: var(--text-2); }
+
+    /* 数量コントロール */
+    .qty-control {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .qty-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 1px solid var(--outline);
+      background: transparent;
+      color: var(--primary);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+    .qty-btn:hover { background: var(--primary-dim); border-color: var(--primary); }
+    .qty-val {
+      font-size: 1.1rem;
+      font-weight: 700;
+      min-width: 22px;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* カスタムドリンク入力 */
+    .custom-input {
+      background: var(--surface-hi);
+      border: 1px solid var(--outline);
+      border-radius: 6px;
+      padding: 5px 8px;
+      color: var(--text-1);
+      font-family: var(--font);
+      font-size: 0.82rem;
+      outline: none;
+    }
+    .custom-input:focus { border-color: var(--primary); }
+    .custom-input.name-input { width: 100%; display: block; margin-bottom: 4px; }
+    .custom-input.price-input { width: 70px; text-align: right; }
+
+    .add-custom-btn {
+      width: 100%;
+      padding: 10px;
+      margin-top: 12px;
+      background: transparent;
+      border: 1px dashed rgba(130,170,204,0.35);
+      border-radius: var(--radius);
+      color: var(--primary);
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: all 0.2s;
+    }
+    .add-custom-btn:hover { background: var(--primary-dim); border-style: solid; }
+
+    /* シャンパンシミュ */
+    .champ-sim-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .champ-sim-item { background: var(--surface-hi); border-radius: var(--radius); padding: 10px; text-align: center; transition: background 0.2s; }
+    .champ-sim-item:hover { background: rgba(255,255,255,0.08); }
+    .champ-sim-name { font-size: 0.78rem; font-weight: 700; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .champ-sim-price { font-size: 0.68rem; color: var(--text-2); margin-bottom: 6px; }
+    .champ-sim-total { font-size: 1.1rem; font-weight: 700; color: var(--primary); line-height: 1; }
+    .champ-sim-diff { font-size: 0.7rem; color: var(--error); margin-top: 3px; }
+    @media (max-width: 380px) { .champ-sim-grid { grid-template-columns: 1fr; } }
+
+    /* サマリーテーブル */
+    .summary-table tr { border-bottom: 1px solid var(--divider); }
+    .summary-table tr:last-child { border-bottom: none; }
+    .summary-table td { padding: 8px 4px; font-size: 0.87rem; }
+    .summary-table td:first-child { color: var(--text-2); }
+    .summary-table td:last-child { text-align: right; font-weight: 700; }
+    .summary-table .total-row td { padding-top: 12px; font-size: 1rem; color: var(--primary); }
+
+    /* PWA更新通知 */
+    #updateNotification {
+      display: none;
+      background: rgba(130,170,204,0.1);
+      border: 1px solid rgba(130,170,204,0.35);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--primary);
+      margin-bottom: 14px;
+    }
+    #updateButton {
+      background: var(--primary);
+      color: var(--primary-on);
+      border: none;
+      padding: 5px 12px;
+      border-radius: 5px;
+      margin-left: 8px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+  </style>
+  <link rel="stylesheet" href="theme.css?v=2.16">
+  <script src="app-core.js?v=2.16"></script>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>シミュレーション</h1>
+    <div class="subtitle">Amount Simulation</div>
+  </header>
+
+  <div id="updateNotification">
+    v2.16 の更新があります <button id="updateButton">今すぐ更新</button>
+  </div>
+
+  <!-- 合計金額 -->
+  <div class="card" id="sim-total-card">
+    <div id="sim-total-label">シミュレーション合計</div>
+    <div id="simulation_grand_total">0<span>円</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">テンプレート</div>
+    <div class="template-grid">
+      <button type="button" data-template="light">軽め</button>
+      <button type="button" data-template="normal">通常</button>
+      <button type="button" data-template="long">長時間</button>
+      <button type="button" data-template="champagne">シャンパンあり</button>
+    </div>
+  </div>
+
+  <!-- 滞在時間 -->
+  <div class="card">
+    <div class="card-title">滞在時間</div>
+    <div class="time-display" id="simulated_time_display">00:00</div>
+    <div class="time-sub">HH : MM</div>
+    <div class="time-control-buttons">
+      <button class="btn btn-primary" id="add_40_min_button">＋40分</button>
+      <button class="btn btn-ghost" id="subtract_40_min_button">－40分</button>
+      <button class="btn btn-danger" id="reset_time_button">リセット</button>
+    </div>
+    <div class="set-info">
+      <span class="set-info-label">セット数</span>
+      <span class="set-badge" id="sim_set_count">0</span>
+    </div>
+    <div class="card-actions">
+      <button class="btn btn-danger" id="resetSimulationButton">シミュレーションをリセット</button>
+    </div>
+  </div>
+
+  <!-- ドリンク -->
+  <div class="card">
+    <div class="card-title">ドリンク</div>
+    <table class="drink-table" id="simulationDrinkTable">
+      <thead>
+        <tr>
+          <th>項目</th>
+          <th>価格</th>
+          <th>数量</th>
+          <th>小計</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Lドリンク</td>
+          <td class="price-col" data-price="1700">¥1,700</td>
+          <td><div class="qty-control"><button class="qty-btn" data-item="ldrink" data-delta="1">＋</button><span class="qty-val" id="ldrink_qty">0</span><button class="qty-btn" data-item="ldrink" data-delta="-1">－</button></div></td>
+          <td class="total-col zero" id="ldrink_total">—</td>
+        </tr>
+        <tr>
+          <td>メガドリンク</td>
+          <td class="price-col" data-price="3700">¥3,700</td>
+          <td><div class="qty-control"><button class="qty-btn" data-item="megadrink" data-delta="1">＋</button><span class="qty-val" id="megadrink_qty">0</span><button class="qty-btn" data-item="megadrink" data-delta="-1">－</button></div></td>
+          <td class="total-col zero" id="megadrink_total">—</td>
+        </tr>
+        <tr>
+          <td>SHOT</td>
+          <td class="price-col" data-price="1500">¥1,500</td>
+          <td><div class="qty-control"><button class="qty-btn" data-item="shot" data-delta="1">＋</button><span class="qty-val" id="shot_qty">0</span><button class="qty-btn" data-item="shot" data-delta="-1">－</button></div></td>
+          <td class="total-col zero" id="shot_total">—</td>
+        </tr>
+        <tr>
+          <td>ゲストSHOT</td>
+          <td class="price-col" data-price="1000">¥1,000</td>
+          <td><div class="qty-control"><button class="qty-btn" data-item="guestshot" data-delta="1">＋</button><span class="qty-val" id="guestshot_qty">0</span><button class="qty-btn" data-item="guestshot" data-delta="-1">－</button></div></td>
+          <td class="total-col zero" id="guestshot_total">—</td>
+        </tr>
+        <tr>
+          <td>カラオケ5曲</td>
+          <td class="price-col" data-price="1000">¥1,000</td>
+          <td><div class="qty-control"><button class="qty-btn" data-item="karaoke" data-delta="1">＋</button><span class="qty-val" id="karaoke_qty">0</span><button class="qty-btn" data-item="karaoke" data-delta="-1">－</button></div></td>
+          <td class="total-col zero" id="karaoke_total">—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- シャンパン -->
+  <div class="card">
+    <div class="card-title">シャンパン</div>
+    <table class="drink-table" id="simulationChampagneTable">
+      <thead>
+        <tr>
+          <th>項目</th>
+          <th>価格</th>
+          <th>数量</th>
+          <th>小計</th>
+        </tr>
+      </thead>
+      <tbody id="champagne_table_body"></tbody>
+    </table>
+  </div>
+
+  <!-- カスタムドリンク -->
+  <div class="card">
+    <div class="card-title">カスタムドリンク</div>
+    <table class="drink-table" id="addMoreSimDrink">
+      <thead>
+        <tr>
+          <th>ドリンク名</th>
+          <th>金額</th>
+          <th>数量</th>
+          <th>小計</th>
+        </tr>
+      </thead>
+      <tbody id="newSimDrinkRows"></tbody>
+    </table>
+    <button class="add-custom-btn" id="addNewSimDrinkRowButton">＋ カスタムドリンク追加</button>
+  </div>
+
+  <!-- シャンパン入れたら？ -->
+  <div class="card">
+    <div class="card-title">シャンパン入れたら？</div>
+    <div class="champ-sim-grid" id="champ-sim-grid"></div>
+  </div>
+
+  <!-- 会計サマリー -->
+  <div class="card">
+    <div class="card-title">会計サマリー</div>
+    <table class="summary-table">
+      <tr><td>セット合計</td><td id="sim_set_sum">¥0</td></tr>
+      <tr><td>ドリンク・シャンパン合計</td><td id="sim_drink_sum">¥0</td></tr>
+      <tr><td>小計</td><td id="sim_subtotal_summary">¥0</td></tr>
+      <tr><td>サービス料 (10%)</td><td id="sim_service">¥0</td></tr>
+      <tr><td>消費税 (10%)</td><td id="sim_tax">¥0</td></tr>
+      <tr class="total-row"><td>合計金額</td><td id="sim_grand_total_summary">¥0</td></tr>
+    </table>
+    <div class="card-actions">
+      <button class="btn btn-save" id="saveSimulationButton">シミュ保存</button>
+      <button class="btn btn-ghost" id="compareHistoryButton">直近履歴と比較</button>
+    </div>
+    <div class="budget-insight" id="sim-compare-result"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">保存済みシミュレーション</div>
+    <div id="saved-simulation-list"><div class="history-empty">保存済みはまだありません</div></div>
+  </div>
+</div>
+
+<nav class="bottom-tabs" aria-label="画面切り替え">
+  <a class="bottom-tab" href="index.html">会計</a>
+  <button class="bottom-tab tab-current" type="button" disabled>シミュ</button>
+  <a class="bottom-tab" href="menu.html">メニュー</a>
+  <a class="bottom-tab" href="settings.html">設定</a>
+</nav>
+
+<div class="sheet-backdrop" id="confirm-sheet" aria-hidden="true">
+  <div class="confirm-sheet-panel">
+    <div class="confirm-title" id="confirm-title">確認</div>
+    <div class="confirm-message" id="confirm-message">実行しますか？</div>
+    <div class="confirm-actions">
+      <button type="button" class="btn btn-ghost" id="confirm-cancel">キャンセル</button>
+      <button type="button" class="btn btn-danger" id="confirm-ok">実行</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const MAX_NEW_DRINKS = 5;
+
+  const $ = id => document.getElementById(id);
+  const activeProfile = AppCore.getActiveProfile();
+  const SET_DURATION_MINUTES = activeProfile.setMinutes || 40;
+  const champagnes = activeProfile.champagnes;
+
+  const prices = {};
+  const quantities = {};
+  activeProfile.drinks.forEach(d => { prices[d.id] = d.price; quantities[d.id] = 0; });
+  const champagneQuantities = {};
+  champagnes.forEach(ch => { champagneQuantities[ch.id] = 0; });
+
+  let simulatedTotalMinutes = 0;
+  let newDrinkCount = 0;
+  let newDrinkIds = [];
+  let serviceWorkerNewWorker;
+  let pendingConfirm = null;
+  let lastTotal = 0;
+
+  function fmt(num) { return num > 0 ? '¥' + num.toLocaleString() : '—'; }
+  function fmtPlain(num) { return '¥' + num.toLocaleString(); }
+
+  function formatMinutes(m) {
+    const h = Math.floor(m / 60);
+    const min = m % 60;
+    return `${String(h).padStart(2,'0')}:${String(min).padStart(2,'0')}`;
+  }
+
+  function updateItemDisplay(item) {
+    const qEl = $(`${item}_qty`);
+    const tEl = $(`${item}_total`);
+    if (qEl) qEl.textContent = quantities[item];
+    if (tEl) {
+      const total = (prices[item] || 0) * (quantities[item] || 0);
+      tEl.textContent = fmt(total);
+      tEl.classList.toggle('zero', total === 0);
+    }
+  }
+
+  function updateChampagneDisplay(id) {
+    const qEl = $(`champagne-qty-${id}`);
+    const tEl = $(`champagne-total-${id}`);
+    const ch = champagnes.find(c => c.id === id);
+    if (!ch) return;
+    const qty = champagneQuantities[id] || 0;
+    const total = ch.price * qty;
+    if (qEl) qEl.textContent = qty;
+    if (tEl) {
+      tEl.textContent = fmt(total);
+      tEl.classList.toggle('zero', total === 0);
+    }
+  }
+
+  function adjustQuantity(item, delta) {
+    quantities[item] = Math.max(0, (quantities[item] || 0) + delta);
+    updateItemDisplay(item);
+    calculateSimulationTotal();
+  }
+
+  function adjustChampagneQuantity(item, delta) {
+    champagneQuantities[item] = Math.max(0, champagneQuantities[item] + delta);
+    updateChampagneDisplay(item);
+    calculateSimulationTotal();
+  }
+
+  function calculateSimulationTotal() {
+    let setTotal = 0;
+    if (simulatedTotalMinutes > 0) {
+      const sets = Math.ceil(simulatedTotalMinutes / SET_DURATION_MINUTES);
+      setTotal = activeProfile.firstSetPrice + Math.max(0, sets - 1) * activeProfile.extensionSetPrice;
+      $('sim_set_count').textContent = sets;
+    } else {
+      $('sim_set_count').textContent = 0;
+    }
+
+    let drinkTotal = 0;
+    Object.keys(quantities).forEach(k => { drinkTotal += (prices[k] || 0) * (quantities[k] || 0); });
+    champagnes.forEach(ch => { drinkTotal += ch.price * (champagneQuantities[ch.id] || 0); });
+    newDrinkIds.forEach(id => { drinkTotal += (prices[id] || 0) * (quantities[id] || 0); });
+
+    const subtotal = setTotal + drinkTotal;
+    const service = Math.floor(subtotal * activeProfile.serviceRate);
+    const subtotalWithService = subtotal + service;
+    const tax = Math.floor(subtotalWithService * activeProfile.taxRate);
+    const finalTotal = Math.round((subtotalWithService + tax) / 100) * 100;
+    lastTotal = finalTotal;
+
+    $('simulated_time_display').textContent = formatMinutes(simulatedTotalMinutes);
+    $('simulation_grand_total').innerHTML = `${finalTotal.toLocaleString()}<span>円</span>`;
+    $('sim_set_sum').textContent = fmtPlain(setTotal);
+    $('sim_drink_sum').textContent = fmtPlain(drinkTotal);
+    $('sim_subtotal_summary').textContent = fmtPlain(subtotal);
+    $('sim_service').textContent = fmtPlain(service);
+    $('sim_tax').textContent = fmtPlain(tax);
+    $('sim_grand_total_summary').textContent = fmtPlain(finalTotal);
+
+    updateChampSim(subtotal, finalTotal);
+    return { total: finalTotal, setTotal, drinkTotal, subtotal, service, tax };
+  }
+
+  function buildChampSim() {
+    const grid = $('champ-sim-grid');
+    grid.innerHTML = '';
+    champagnes.forEach(ch => {
+      const el = document.createElement('div');
+      el.className = 'champ-sim-item';
+      el.innerHTML = `
+        <div class="champ-sim-name" title="${ch.name}">${ch.name}</div>
+        <div class="champ-sim-price">¥${ch.price.toLocaleString()}</div>
+        <div class="champ-sim-total" id="csim-total-${ch.id}">—</div>
+        <div class="champ-sim-diff"  id="csim-diff-${ch.id}"></div>
+      `;
+      grid.appendChild(el);
+    });
+  }
+
+  function updateChampSim(currentSubtotal, currentFinalTotal) {
+    champagnes.forEach(ch => {
+      const newSub   = currentSubtotal + ch.price;
+      const newSvc   = Math.floor(newSub * activeProfile.serviceRate);
+      const newTax   = Math.floor((newSub + newSvc) * activeProfile.taxRate);
+      const newTotal = Math.round((newSub + newSvc + newTax) / 100) * 100;
+      const diff     = newTotal - currentFinalTotal;
+      const tEl = $(`csim-total-${ch.id}`);
+      const dEl = $(`csim-diff-${ch.id}`);
+      if (tEl) tEl.textContent = `¥${newTotal.toLocaleString()}`;
+      if (dEl) dEl.textContent = `+¥${diff.toLocaleString()}`;
+    });
+  }
+
+  function renderChampagneTable() {
+    const tbody = $('champagne_table_body');
+    tbody.innerHTML = '';
+    champagnes.forEach(ch => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${ch.name}</td>
+        <td class="price-col">¥${ch.price.toLocaleString()}</td>
+        <td>
+          <div class="qty-control">
+            <button class="qty-btn" data-item="${ch.id}" data-type="champagne" data-delta="1">＋</button>
+            <span class="qty-val" id="champagne-qty-${ch.id}">0</span>
+            <button class="qty-btn" data-item="${ch.id}" data-type="champagne" data-delta="-1">－</button>
+          </div>
+        </td>
+        <td class="total-col zero" id="champagne-total-${ch.id}">—</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function addNewSimDrinkRow() {
+    if (newDrinkCount >= MAX_NEW_DRINKS) {
+      alert(`カスタムドリンクは${MAX_NEW_DRINKS}個までです`);
+      return;
+    }
+    newDrinkCount++;
+    const id = `sim_newdrink${newDrinkCount}`;
+    newDrinkIds.push(id);
+    prices[id] = 0;
+    quantities[id] = 0;
+
+    const tbody = $('newSimDrinkRows');
+    const tr = document.createElement('tr');
+    tr.dataset.rowId = id;
+    tr.innerHTML = `
+      <td><input type="text" class="custom-input name-input" id="${id}_name" placeholder="ドリンク名"></td>
+      <td><input type="number" class="custom-input price-input" id="${id}_price" placeholder="金額" min="0"></td>
+      <td>
+        <div class="qty-control">
+          <button class="qty-btn" data-item="${id}" data-delta="1">＋</button>
+          <span class="qty-val" id="${id}_qty">0</span>
+          <button class="qty-btn" data-item="${id}" data-delta="-1">－</button>
+        </div>
+      </td>
+      <td class="total-col zero" id="${id}_total">—</td>
+    `;
+    tbody.appendChild(tr);
+
+    $(`${id}_price`).addEventListener('input', () => {
+      prices[id] = parseInt($(`${id}_price`).value) || 0;
+      updateItemDisplay(id);
+      calculateSimulationTotal();
+    });
+    tr.querySelectorAll('.qty-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        const it = e.target.dataset.item;
+        const d = parseInt(e.target.dataset.delta);
+        quantities[it] = Math.max(0, (quantities[it] || 0) + d);
+        updateItemDisplay(it);
+        calculateSimulationTotal();
+      });
+    });
+  }
+
+  function resetSimulation() {
+    showConfirm('シミュレーションリセット', '時間、数量、カスタムドリンクをリセットします。', () => {
+      simulatedTotalMinutes = 0;
+      Object.keys(quantities).forEach(k => { quantities[k] = 0; updateItemDisplay(k); });
+      champagnes.forEach(ch => { champagneQuantities[ch.id] = 0; updateChampagneDisplay(ch.id); });
+      newDrinkIds.forEach(id => { delete prices[id]; delete quantities[id]; });
+      newDrinkIds = [];
+      newDrinkCount = 0;
+      $('newSimDrinkRows').innerHTML = '';
+      buildChampSim();
+      calculateSimulationTotal();
+    });
+  }
+
+  function showConfirm(title, message, onOk) {
+    pendingConfirm = onOk;
+    $('confirm-title').textContent = title;
+    $('confirm-message').textContent = message;
+    $('confirm-sheet').classList.add('show');
+    $('confirm-sheet').setAttribute('aria-hidden', 'false');
+  }
+
+  function hideConfirm() {
+    pendingConfirm = null;
+    $('confirm-sheet').classList.remove('show');
+    $('confirm-sheet').setAttribute('aria-hidden', 'true');
+  }
+
+  function updateBaseDrinkRows() {
+    activeProfile.drinks.forEach(d => {
+      const priceCell = document.querySelector(`[data-price][id="${d.id}_price"]`) || document.querySelector(`#${d.id}_total`)?.closest('tr')?.querySelector('.price-col');
+      const row = document.querySelector(`#${d.id}_qty`)?.closest('tr');
+      if (row) row.cells[0].textContent = d.name;
+      if (priceCell) priceCell.textContent = `¥${d.price.toLocaleString()}`;
+    });
+  }
+
+  function applyTemplate(name) {
+    resetQuantitiesOnly();
+    const firstChamp = champagnes[0];
+    const templates = {
+      light: { minutes: SET_DURATION_MINUTES, drinks: { ldrink: 1 } },
+      normal: { minutes: SET_DURATION_MINUTES * 2, drinks: { ldrink: 2, shot: 1 } },
+      long: { minutes: SET_DURATION_MINUTES * 4, drinks: { ldrink: 3, megadrink: 1, shot: 2 } },
+      champagne: { minutes: SET_DURATION_MINUTES * 3, drinks: { ldrink: 2 }, champagne: firstChamp ? { [firstChamp.id]: 1 } : {} },
+    };
+    const tpl = templates[name];
+    if (!tpl) return;
+    simulatedTotalMinutes = tpl.minutes;
+    Object.keys(tpl.drinks || {}).forEach(id => { if (id in quantities) quantities[id] = tpl.drinks[id]; });
+    Object.keys(tpl.champagne || {}).forEach(id => { if (id in champagneQuantities) champagneQuantities[id] = tpl.champagne[id]; });
+    Object.keys(quantities).forEach(updateItemDisplay);
+    champagnes.forEach(ch => updateChampagneDisplay(ch.id));
+    calculateSimulationTotal();
+  }
+
+  function resetQuantitiesOnly() {
+    Object.keys(quantities).forEach(k => { quantities[k] = 0; updateItemDisplay(k); });
+    Object.keys(champagneQuantities).forEach(k => { champagneQuantities[k] = 0; updateChampagneDisplay(k); });
+  }
+
+  function saveSimulation() {
+    const bill = calculateSimulationTotal();
+    const saved = AppCore.read(AppCore.KEYS.simulations, []);
+    saved.push({
+      id: `sim_${Date.now()}`,
+      timestamp: Date.now(),
+      profileSnapshot: AppCore.snapshotProfile(activeProfile),
+      minutes: simulatedTotalMinutes,
+      quantities: AppCore.clone(quantities),
+      champagneQuantities: AppCore.clone(champagneQuantities),
+      total: bill.total,
+    });
+    AppCore.write(AppCore.KEYS.simulations, saved.slice(-30));
+    renderSavedSimulations();
+  }
+
+  function renderSavedSimulations() {
+    const saved = AppCore.read(AppCore.KEYS.simulations, []);
+    const list = $('saved-simulation-list');
+    if (!saved.length) {
+      list.innerHTML = '<div class="history-empty">保存済みはまだありません</div>';
+      return;
+    }
+    list.innerHTML = saved.slice().reverse().map(s => {
+      const d = new Date(s.timestamp).toLocaleString('ja-JP');
+      return `<div class="history-item"><div class="history-item-header"><div class="history-item-date">${d}</div><div class="history-item-total">¥${s.total.toLocaleString()}</div></div><div class="history-item-detail">${s.profileSnapshot?.name || ''} / ${formatMinutes(s.minutes)}</div></div>`;
+    }).join('');
+  }
+
+  function compareLatestHistory() {
+    const hist = AppCore.migrateHistory();
+    if (!hist.length) {
+      $('sim-compare-result').textContent = '比較できる会計履歴がありません';
+      return;
+    }
+    const last = hist[hist.length - 1];
+    const diff = lastTotal - (last.actualTotal || last.total);
+    $('sim-compare-result').textContent = `直近実会計との差額: ${diff === 0 ? '±0' : (diff > 0 ? '+' : '') + '¥' + diff.toLocaleString()}`;
+  }
+
+  function applyHistorySeed() {
+    const seed = AppCore.read('simulation_seed', null);
+    if (!seed) return;
+    simulatedTotalMinutes = (seed.sets || 0) * SET_DURATION_MINUTES;
+    Object.assign(quantities, seed.session?.drinkQty || {});
+    Object.keys(quantities).forEach(updateItemDisplay);
+    localStorage.removeItem('simulation_seed');
+  }
+
+  function showUpdateBar() {
+    const n = $('updateNotification');
+    if (n) n.style.display = 'block';
+    const btn = $('updateButton');
+    if (btn) btn.addEventListener('click', () => {
+      if (serviceWorkerNewWorker) serviceWorkerNewWorker.postMessage({ action: 'skipWaiting' });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    updateBaseDrinkRows();
+    renderChampagneTable();
+    buildChampSim();
+    applyHistorySeed();
+    calculateSimulationTotal();
+    renderSavedSimulations();
+
+    $('add_40_min_button').addEventListener('click', () => { simulatedTotalMinutes += SET_DURATION_MINUTES; calculateSimulationTotal(); });
+    $('subtract_40_min_button').addEventListener('click', () => { simulatedTotalMinutes = Math.max(0, simulatedTotalMinutes - SET_DURATION_MINUTES); calculateSimulationTotal(); });
+    $('reset_time_button').addEventListener('click', () => { simulatedTotalMinutes = 0; calculateSimulationTotal(); });
+    $('resetSimulationButton').addEventListener('click', resetSimulation);
+    $('addNewSimDrinkRowButton').addEventListener('click', addNewSimDrinkRow);
+    $('saveSimulationButton').addEventListener('click', saveSimulation);
+    $('compareHistoryButton').addEventListener('click', compareLatestHistory);
+    $('confirm-cancel').addEventListener('click', hideConfirm);
+    $('confirm-ok').addEventListener('click', () => {
+      const fn = pendingConfirm;
+      hideConfirm();
+      if (fn) fn();
+    });
+    $('confirm-sheet').addEventListener('click', e => { if (e.target.id === 'confirm-sheet') hideConfirm(); });
+    document.querySelectorAll('[data-template]').forEach(btn => {
+      btn.addEventListener('click', () => applyTemplate(btn.dataset.template));
+    });
+
+    // イベント委譲
+    $('simulationDrinkTable').addEventListener('click', e => {
+      const btn = e.target.closest('.qty-btn[data-item]');
+      if (btn && !btn.dataset.type) adjustQuantity(btn.dataset.item, parseInt(btn.dataset.delta));
+    });
+    $('simulationChampagneTable').addEventListener('click', e => {
+      const btn = e.target.closest('.qty-btn[data-type="champagne"]');
+      if (btn) adjustChampagneQuantity(btn.dataset.item, parseInt(btn.dataset.delta));
+    });
+
+    document.addEventListener('touchend', e => { if (e.detail > 1) e.preventDefault(); }, { passive: false });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js?v=2.16', { updateViaCache: 'none' })
+          .then(reg => {
+            reg.update();
+            reg.addEventListener('updatefound', () => {
+              serviceWorkerNewWorker = reg.installing;
+              serviceWorkerNewWorker.addEventListener('statechange', () => {
+                if (serviceWorkerNewWorker.state === 'installed' && navigator.serviceWorker.controller) showUpdateBar();
+              });
+            });
+          }).catch(e => console.log('SW error:', e));
+        navigator.serviceWorker.addEventListener('controllerchange', () => window.location.reload());
+      });
+    }
+  });
+})();
+</script>
+</body>
+</html>

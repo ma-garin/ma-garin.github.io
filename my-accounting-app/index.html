@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>会計・時間管理</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text-1);
+      min-height: 100vh;
+      padding: 0 12px 80px;
+    }
+
+    .container { max-width: 500px; margin: auto; }
+
+    /* ── Top App Bar ── */
+    header {
+      padding: 18px 4px 14px;
+      border-bottom: 1px solid var(--divider);
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    header h1 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 0.06em;
+    }
+    header .subtitle {
+      font-size: 0.72rem;
+      color: var(--text-2);
+      margin-top: 3px;
+      letter-spacing: 0.12em;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--surface);
+      border-radius: var(--r);
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+    }
+    .card-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-2);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title::after { content: ''; flex: 1; height: 1px; background: var(--divider); }
+
+    /* ── 合計金額カード ── */
+    #current-total-card {
+      background: var(--primary-cont);
+      text-align: center;
+      padding: 22px 16px 18px;
+    }
+    #current-total-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      color: var(--primary-txt);
+      opacity: 0.8;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+    #current_grand_total {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--primary-txt);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    #current_grand_total span { font-size: 1.2rem; margin-left: 4px; opacity: 0.75; }
+
+    /* ── 予算バー ── */
+    #budget-bar-wrap { margin-top: 16px; display: none; }
+    #budget-bar-wrap.visible { display: block; }
+    .budget-label-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--primary-txt);
+      opacity: 0.85;
+      margin-bottom: 8px;
+    }
+    .budget-bar-bg { background: rgba(255,255,255,0.15); border-radius: 99px; height: 6px; overflow: hidden; }
+    #budget-bar { height: 100%; border-radius: 99px; background: var(--success); transition: width 0.4s, background 0.4s; width: 0%; }
+    #budget-bar.warn   { background: var(--warning); }
+    #budget-bar.danger { background: var(--error); }
+    #budget-alert { margin-top: 10px; font-size: 0.8rem; font-weight: 700; text-align: center; color: var(--error); display: none; }
+    #budget-alert.show { display: block; animation: pulse 1s infinite; }
+
+    /* ── あと何杯 ── */
+    #drink-calc-section { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.12); display: none; }
+    #drink-calc-section.visible { display: block; }
+    .drink-calc-title { font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--primary-txt); opacity: 0.75; margin-bottom: 10px; }
+    .drink-calc-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .drink-calc-item { background: rgba(255,255,255,0.08); border-radius: var(--r-sm); padding: 10px; text-align: center; }
+    .drink-calc-item .dc-name  { font-size: 0.75rem; color: var(--primary-txt); opacity: 0.8; margin-bottom: 4px; }
+    .drink-calc-item .dc-count { font-size: 1.5rem; font-weight: 700; color: var(--primary-txt); line-height: 1; }
+    .drink-calc-item .dc-count.ng { color: var(--error); font-size: 1rem; }
+    .drink-calc-item .dc-unit  { font-size: 0.68rem; color: var(--primary-txt); opacity: 0.65; margin-top: 2px; }
+
+    /* ── 予算設定 ── */
+    .budget-input-row { display: flex; align-items: center; gap: 8px; }
+    .budget-input-row input {
+      flex: 1;
+      background: var(--surface-hi);
+      border: 1px solid var(--outline);
+      border-radius: var(--r-sm);
+      padding: 11px 12px;
+      color: var(--text-1);
+      font-family: var(--font);
+      font-size: 1rem;
+      outline: none;
+      text-align: right;
+      transition: border-color 0.2s;
+    }
+    .budget-input-row input:focus { border-color: var(--primary); }
+    .budget-input-row .unit { color: var(--text-2); font-size: 0.875rem; white-space: nowrap; }
+    .budget-set-btn {
+      background: var(--primary);
+      color: var(--primary-on);
+      border: none;
+      border-radius: var(--r-sm);
+      padding: 11px 18px;
+      font-weight: 700;
+      font-size: 0.875rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+    }
+    .budget-set-btn:hover { opacity: 0.88; }
+    .budget-clear-btn { background: none; border: none; color: var(--text-3); font-size: 0.78rem; cursor: pointer; text-decoration: underline; margin-top: 8px; }
+
+    /* ── 時間管理 ── */
+    .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+    .time-item { background: var(--surface-hi); border-radius: var(--r-sm); padding: 10px 12px; }
+    .time-item.wide { grid-column: 1 / -1; }
+    .time-item label { font-size: 0.65rem; color: var(--text-2); letter-spacing: 0.12em; text-transform: uppercase; display: block; margin-bottom: 4px; }
+    .time-item .value { font-size: 1.2rem; font-weight: 700; color: var(--text-1); font-variant-numeric: tabular-nums; }
+    .time-item .value.alert { color: var(--error); animation: pulse 1s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.45} }
+    .set-badge {
+      display: inline-block;
+      background: var(--primary-dim);
+      border: 1px solid rgba(130,170,204,0.4);
+      color: var(--primary);
+      border-radius: 8px;
+      padding: 3px 16px;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    /* ── 退店逆算 ── */
+    #checkout-section { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--divider); }
+    .checkout-input-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .checkout-input-row label { font-size: 0.78rem; color: var(--text-2); white-space: nowrap; }
+    .checkout-time-input {
+      flex: 1;
+      background: var(--surface-hi);
+      border: 1px solid var(--outline);
+      border-radius: var(--r-sm);
+      padding: 8px 10px;
+      color: var(--text-1);
+      font-family: var(--font);
+      font-size: 1.1rem;
+      outline: none;
+      text-align: center;
+      transition: border-color 0.2s;
+    }
+    .checkout-time-input:focus { border-color: var(--primary); }
+    #checkout-result { background: var(--surface-hi); border-radius: var(--r-sm); padding: 12px; display: none; }
+    #checkout-result.visible { display: block; }
+    .checkout-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--divider); font-size: 0.875rem; }
+    .checkout-row:last-child { border-bottom: none; }
+    .checkout-row .cr-label { color: var(--text-2); }
+    .checkout-row .cr-val   { font-weight: 700; font-size: 0.95rem; color: var(--text-1); }
+    .checkout-row .cr-val.warn   { color: var(--warning); }
+    .checkout-row .cr-val.safe   { color: var(--success); }
+    .checkout-row .cr-val.danger { color: var(--error); }
+
+    /* ── ボタン ── */
+    .time-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .btn {
+      padding: 12px 8px;
+      border-radius: var(--r-sm);
+      font-family: var(--font);
+      font-size: 0.875rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: none;
+      letter-spacing: 0.02em;
+    }
+    .btn-primary { background: var(--primary); color: var(--primary-on); }
+    .btn-primary:hover { opacity: 0.88; }
+    .btn-ghost { background: var(--surface-hi); color: var(--text-1); border: 1px solid var(--outline); }
+    .btn-ghost:hover { background: rgba(255,255,255,0.08); }
+    .btn-danger { background: var(--error-cont); color: var(--error); border: 1px solid rgba(242,139,130,0.3); }
+    .btn-danger:hover { background: rgba(242,139,130,0.22); }
+
+    /* ── ドリンクカード ── */
+    #drinkListContainer { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .drink-card {
+      background: var(--surface-hi);
+      border: 1px solid transparent;
+      border-radius: var(--r);
+      padding: 12px 10px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .drink-card.has-items { border-color: rgba(130,170,204,0.5); background: var(--primary-dim); }
+    .drink-item-name { font-size: 0.875rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+    .drink-item-price { font-size: 0.75rem; color: var(--text-2); margin-bottom: 10px; }
+    .drink-qty-row { display: flex; align-items: center; justify-content: space-between; }
+    .qty-btn {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--outline);
+      background: transparent;
+      color: var(--primary);
+      font-size: 1.1rem; font-weight: 700;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s; flex-shrink: 0;
+    }
+    .qty-btn:hover { background: var(--primary-dim); border-color: var(--primary); }
+    .drink-current-quantity { font-size: 1.25rem; font-weight: 700; min-width: 28px; text-align: center; font-variant-numeric: tabular-nums; }
+    .drink-item-total { font-size: 0.82rem; color: var(--primary); font-weight: 700; text-align: right; margin-top: 6px; }
+
+    /* ── アコーディオン ── */
+    .accordion-header {
+      background: var(--surface);
+      border: 1px solid var(--outline);
+      border-radius: var(--r);
+      padding: 14px 16px;
+      cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.875rem; font-weight: 700;
+      color: var(--text-2);
+      transition: all 0.2s;
+    }
+    .accordion-header:hover { color: var(--text-1); background: var(--surface-hi); }
+    .accordion-header .arrow { transition: transform 0.2s; font-size: 0.75rem; }
+    .accordion-header.active { border-radius: var(--r) var(--r) 0 0; color: var(--primary); border-color: rgba(130,170,204,0.4); }
+    .accordion-header.active .arrow { transform: rotate(180deg); }
+    .accordion-content {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--outline);
+      border-top: none;
+      border-radius: 0 0 var(--r) var(--r);
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    .accordion-content.open { display: block; }
+    .accordion-item { display: flex; align-items: center; padding: 10px 4px; border-bottom: 1px solid var(--divider); gap: 8px; }
+    .accordion-item:last-child { border-bottom: none; }
+    .accordion-item-info { flex: 1; min-width: 0; }
+    .accordion-item-name  { font-size: 0.875rem; font-weight: 700; }
+    .accordion-item-price { font-size: 0.75rem; color: var(--text-2); }
+    .accordion-item-control { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .accordion-item-quantity { font-size: 1.1rem; font-weight: 700; min-width: 24px; text-align: center; font-variant-numeric: tabular-nums; }
+    .accordion-item-total { font-size: 0.82rem; font-weight: 700; color: var(--primary); min-width: 56px; text-align: right; flex-shrink: 0; }
+    .plus-button, .minus-button {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 1px solid var(--outline);
+      background: transparent;
+      color: var(--primary);
+      font-size: 1rem; font-weight: 700;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+    .plus-button:hover, .minus-button:hover { background: var(--primary-dim); border-color: var(--primary); }
+    .custom-drink-item .accordion-item-info { flex-direction: column; }
+    .custom-drink-name-input,
+    .custom-drink-price-input {
+      background: var(--surface-hi);
+      border: 1px solid var(--outline);
+      border-radius: 6px;
+      padding: 5px 8px;
+      color: var(--text-1);
+      font-family: var(--font);
+      font-size: 0.82rem;
+      outline: none;
+      width: 100%;
+      margin-bottom: 4px;
+    }
+    .custom-drink-price-input { width: 80px; text-align: right; margin-bottom: 0; }
+    .custom-drink-name-input:focus,
+    .custom-drink-price-input:focus { border-color: var(--primary); }
+    .custom-input-row { display: flex; align-items: center; gap: 4px; }
+    .custom-input-row span { font-size: 0.75rem; color: var(--text-2); }
+    .add-custom-btn {
+      width: 100%; padding: 10px; margin-top: 10px;
+      background: transparent;
+      border: 1px dashed rgba(130,170,204,0.35);
+      border-radius: var(--r-sm);
+      color: var(--primary);
+      font-size: 0.875rem; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .add-custom-btn:hover { background: var(--primary-dim); border-style: solid; }
+
+    /* ── 会計サマリー ── */
+    .summary-table { width: 100%; border-collapse: collapse; }
+    .summary-table tr { border-bottom: 1px solid var(--divider); }
+    .summary-table tr:last-child { border-bottom: none; }
+    .summary-table td { padding: 9px 4px; font-size: 0.875rem; }
+    .summary-table td:first-child { color: var(--text-2); }
+    .summary-table td:last-child { text-align: right; font-weight: 700; }
+    .summary-table .total-row td { padding-top: 12px; font-size: 1rem; color: var(--primary); }
+
+    /* ── 訪問比較 ── */
+    .compare-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .compare-item { background: var(--surface-hi); border-radius: var(--r-sm); padding: 12px 8px; text-align: center; }
+    .compare-item .ci-label { font-size: 0.65rem; color: var(--text-2); margin-bottom: 4px; letter-spacing: 0.1em; text-transform: uppercase; }
+    .compare-item .ci-val   { font-size: 1rem; font-weight: 700; color: var(--text-1); }
+    .compare-item .ci-val.up   { color: var(--error); }
+    .compare-item .ci-val.down { color: var(--success); }
+    .compare-item .ci-sub  { font-size: 0.68rem; color: var(--text-2); margin-top: 2px; }
+
+    /* ── 履歴 ── */
+    #history-list { max-height: 300px; overflow-y: auto; }
+    #history-list::-webkit-scrollbar { width: 4px; }
+    #history-list::-webkit-scrollbar-thumb { background: var(--outline); border-radius: 2px; }
+    .history-item { background: var(--surface-hi); border-radius: var(--r-sm); padding: 12px; margin-bottom: 8px; }
+    .history-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .history-item-date   { font-size: 0.75rem; color: var(--text-2); }
+    .history-item-total  { font-size: 1.05rem; font-weight: 700; color: var(--primary); }
+    .history-item-detail { font-size: 0.75rem; color: var(--text-2); }
+    .history-empty { text-align: center; color: var(--text-2); font-size: 0.875rem; padding: 20px; }
+    .history-clear-btn { font-size: 0.75rem; color: var(--error); background: none; border: none; cursor: pointer; text-decoration: underline; }
+
+    .btn-save { background: var(--primary); color: var(--primary-on); font-weight: 700; }
+    .btn-save:hover { opacity: 0.88; }
+
+    /* ── PWA更新通知 ── */
+    #updateNotification {
+      display: none;
+      background: rgba(130,170,204,0.1);
+      border: 1px solid rgba(130,170,204,0.35);
+      border-radius: var(--r-sm);
+      padding: 10px 14px;
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--primary);
+      margin-bottom: 12px;
+    }
+    #updateButton {
+      background: var(--primary); color: var(--primary-on);
+      border: none; padding: 5px 12px; border-radius: 5px;
+      margin-left: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 700;
+    }
+
+    @media (max-width: 380px) {
+      #drinkListContainer { grid-template-columns: 1fr; }
+      .compare-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+  <link rel="stylesheet" href="theme.css?v=2.16">
+  <script src="app-core.js?v=2.16"></script>
+</head>
+<body class="has-quick-add">
+<div class="container">
+
+  <header>
+    <h1>会計・時間管理</h1>
+    <div class="subtitle">Accounting &amp; Time Management</div>
+  </header>
+
+  <div id="updateNotification">
+    v2.16 の更新があります <button id="updateButton">今すぐ更新</button>
+  </div>
+
+  <!-- 現在合計 + 予算バー + あと何杯 -->
+  <div class="card" id="current-total-card">
+    <div id="current-total-label">現在の合計金額</div>
+    <div id="current_grand_total">0<span>円</span></div>
+    <div class="status-chip-row" id="status-chip-row">
+      <span class="status-chip safe" id="store-chip">標準ラウンジ</span>
+      <span class="status-chip" id="next-set-chip">次セット --:--</span>
+      <span class="status-chip" id="budget-chip">予算未設定</span>
+    </div>
+    <div id="budget-bar-wrap">
+      <div class="budget-label-row">
+        <span>予算 <span id="budget-label-amount"></span></span>
+        <span id="budget-remaining-text"></span>
+      </div>
+      <div class="budget-bar-bg"><div id="budget-bar"></div></div>
+      <div id="budget-alert">⚠️ 予算を超過しています！</div>
+    </div>
+    <div id="drink-calc-section">
+      <div class="drink-calc-title">残予算でオーダー可能数</div>
+      <div class="drink-calc-grid" id="drink-calc-grid"></div>
+    </div>
+  </div>
+
+  <div class="card status-card">
+    <div class="card-title">状況メモ</div>
+    <div class="status-grid">
+      <div class="status-item"><span>現在見込み</span><strong id="status-current-total">¥0</strong></div>
+      <div class="status-item"><span>次セットまで</span><strong id="status-next-set">--:--</strong></div>
+      <div class="status-item"><span>予算残り</span><strong id="status-budget-left">未設定</strong></div>
+      <div class="status-item"><span>退店予定時見込み</span><strong id="status-checkout-total">未設定</strong></div>
+    </div>
+    <div id="constraint-alert" class="constraint-alert"></div>
+  </div>
+
+  <!-- 予算設定 -->
+  <div class="card">
+    <div class="card-title">予算設定</div>
+    <div class="budget-input-row">
+      <input type="number" id="budget-input" placeholder="例：30000" min="0" step="1000">
+      <span class="unit">円</span>
+      <button class="budget-set-btn" id="budget-set-btn">設定</button>
+    </div>
+    <div style="text-align:right;margin-top:6px;">
+      <button class="budget-clear-btn" id="budget-clear-btn">予算をクリア</button>
+    </div>
+    <div class="budget-insight" id="budget-insight">予算を入れると安全セット数を表示します</div>
+  </div>
+
+  <!-- 時間管理 + 退店逆算 -->
+  <div class="card">
+    <div class="card-title">時間管理</div>
+    <div class="time-grid">
+      <div class="time-item"><label>現在時刻</label><div class="value" id="now">--:--:--</div></div>
+      <div class="time-item"><label>開始時刻</label><div class="value" id="start">--</div></div>
+      <div class="time-item"><label>経過時間</label><div class="value" id="elapsed_time">--:--:--</div></div>
+      <div class="time-item"><label>セット数</label><div class="value"><span class="set-badge" id="total_sets">0</span></div></div>
+      <div class="time-item wide"><label>現セット残り</label><div class="value" id="remaining">--:--</div></div>
+    </div>
+    <div class="time-buttons">
+      <button class="btn btn-primary" id="startButton">▶ 開始</button>
+      <button class="btn btn-ghost"   id="pauseButton">⏸ 一時停止</button>
+      <button class="btn btn-ghost"   id="endButton">⏹ 終了</button>
+      <button class="btn btn-danger"  id="resetTimerButton">↺ リセット</button>
+    </div>
+    <div id="checkout-section">
+      <div class="checkout-input-row" style="margin-top:14px;">
+        <label>退店予定時刻</label>
+        <input type="time" class="checkout-time-input" id="checkout-time-input">
+      </div>
+      <div class="checkout-input-row">
+        <label>閉店時刻</label>
+        <input type="time" class="checkout-time-input" id="closing-time-input">
+      </div>
+      <div class="checkout-input-row">
+        <label>終電/次予定</label>
+        <input type="time" class="checkout-time-input" id="next-plan-time-input">
+      </div>
+      <div id="checkout-result">
+        <div class="checkout-row"><span class="cr-label">退店まで</span><span class="cr-val" id="co-timeleft"></span></div>
+        <div class="checkout-row"><span class="cr-label">追加セット数</span><span class="cr-val" id="co-extra-sets"></span></div>
+        <div class="checkout-row"><span class="cr-label">追加セット料金(税込)</span><span class="cr-val" id="co-extra-cost"></span></div>
+        <div class="checkout-row"><span class="cr-label">次の切替まで</span><span class="cr-val" id="co-next-set"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 主要ドリンク -->
+  <div class="card">
+    <div class="card-title">主要ドリンク</div>
+    <div id="drinkListContainer"></div>
+  </div>
+
+  <!-- その他ドリンク -->
+  <div class="accordion-header" id="otherDrinksAccordionHeader">
+    その他のドリンク <span class="arrow">▼</span>
+  </div>
+  <div class="accordion-content" id="otherDrinksAccordionContent">
+    <div id="newDrinkRowsContainer"></div>
+    <button class="add-custom-btn" id="addNewDrinkRowButton">＋ カスタムドリンク追加</button>
+  </div>
+
+  <!-- 会計サマリー -->
+  <div class="card">
+    <div class="card-title">会計サマリー</div>
+    <table class="summary-table">
+      <tr><td>セット合計</td><td id="set_sum">¥0</td></tr>
+      <tr><td>ドリンク合計</td><td id="drink_sum">¥0</td></tr>
+      <tr><td>小計</td><td id="subtotal_summary">¥0</td></tr>
+      <tr><td id="service_label">サービス料</td><td id="service">¥0</td></tr>
+      <tr><td id="tax_label">消費税</td><td id="tax">¥0</td></tr>
+      <tr class="total-row"><td>合計金額</td><td id="grand_total_summary">¥0</td></tr>
+    </table>
+    <details class="save-details">
+      <summary>保存メモを開く</summary>
+      <div class="save-form">
+        <label>店名<input id="visit-store-name" type="text" placeholder="店名"></label>
+        <label>キャスト名<input id="visit-cast-name" type="text" placeholder="任意"></label>
+        <label class="check-row"><input id="visit-nominated" type="checkbox"> 指名あり</label>
+        <label>満足度<select id="visit-satisfaction"><option value="">未選択</option><option>高</option><option>普通</option><option>低</option></select></label>
+        <label>実請求額<input id="visit-actual-total" type="number" placeholder="予測と同じなら空欄" min="0" step="100"></label>
+        <label class="wide">メモ<textarea id="visit-memo" rows="3" placeholder="個人メモはここだけに保存"></textarea></label>
+      </div>
+    </details>
+    <div class="card-actions">
+      <button class="btn btn-save" id="saveHistoryBtn">会計保存</button>
+      <button class="btn btn-danger" id="resetAllButton">リセット</button>
+    </div>
+  </div>
+
+  <!-- 訪問比較 -->
+  <div class="card">
+    <div class="card-title">訪問比較</div>
+    <div class="compare-grid">
+      <div class="compare-item"><div class="ci-label">今回</div><div class="ci-val" id="compare-current">¥0</div></div>
+      <div class="compare-item"><div class="ci-label">平均</div><div class="ci-val" id="compare-avg">—</div><div class="ci-sub" id="compare-count"></div></div>
+      <div class="compare-item"><div class="ci-label">前回比</div><div class="ci-val" id="compare-diff">—</div><div class="ci-sub" id="compare-diff-sub"></div></div>
+    </div>
+  </div>
+
+  <!-- 履歴 -->
+  <div class="card">
+    <div class="card-title">
+      会計履歴
+      <button class="history-clear-btn" id="clearHistoryBtn">全削除</button>
+    </div>
+    <div id="history-list"><div class="history-empty">履歴はまだありません</div></div>
+  </div>
+
+</div>
+
+<nav class="bottom-tabs" aria-label="画面切り替え">
+  <button class="bottom-tab tab-current" type="button" disabled>会計</button>
+  <a class="bottom-tab" href="simulation.html">シミュ</a>
+  <a class="bottom-tab" href="menu.html">メニュー</a>
+  <a class="bottom-tab" href="settings.html">設定</a>
+</nav>
+
+<div class="quick-add-bar" aria-label="クイック追加">
+  <button type="button" data-quick-id="ldrink">L +1</button>
+  <button type="button" data-quick-id="megadrink">メガ +1</button>
+  <button type="button" data-quick-id="shot">SHOT +1</button>
+</div>
+
+<div class="undo-toast" id="undo-toast" role="status">
+  <span id="undo-message">変更しました</span>
+  <button type="button" id="undo-button">Undo</button>
+</div>
+
+<div class="sheet-backdrop" id="confirm-sheet" aria-hidden="true">
+  <div class="confirm-sheet-panel">
+    <div class="confirm-title" id="confirm-title">確認</div>
+    <div class="confirm-message" id="confirm-message">実行しますか？</div>
+    <div class="confirm-actions">
+      <button type="button" class="btn btn-ghost" id="confirm-cancel">キャンセル</button>
+      <button type="button" class="btn btn-danger" id="confirm-ok">実行</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  /* ── 定数 ── */
+  const MS_S = 1000, MS_M = 60000;
+  const MAX_CUSTOM = 5;
+  const KEY_HIST   = 'accounting_history';
+  const KEY_TIMER  = 'timer_state';
+
+  const $  = id => document.getElementById(id);
+  const pad = n  => String(n).padStart(2, '0');
+  const fmtMoney = n => '¥' + n.toLocaleString();
+  const fmtNum   = n => n.toLocaleString();
+  const fmtMs    = ms => {
+    const s = Math.floor(ms / 1000);
+    return `${pad(Math.floor(s/3600))}:${pad(Math.floor((s%3600)/60))}:${pad(s%60)}`;
+  };
+
+  /* ── 状態 ── */
+  let activeProfile = AppCore.getActiveProfile();
+  let DRINKS = activeProfile.drinks;
+  let CALC_DRINKS = activeProfile.drinks.slice(0, 4);
+  let drinkQty  = {}, customCount = 0, customDefs = {};
+  let timerId   = null, tsStart = null, tsPaused = 0, setCount = 0;
+  let budget    = 0;
+  let swNewWorker;
+  let constraints = { checkout: '', closing: '', nextPlan: '' };
+  let lastAction = null, undoTimer = null;
+  let pendingConfirm = null;
+
+  function setMs() { return Math.max(1, Number(activeProfile.setMinutes) || 40) * MS_M; }
+
+  /* ━━━━━ 合計計算 ━━━━━ */
+  function calcTotal() {
+    const bill = AppCore.calculateBill(activeProfile, setCount, drinkQty, customDefs, {});
+    const { total, setTotal, drinkTotal, subtotal, service, tax } = bill;
+
+    $('current_grand_total').innerHTML = `${fmtNum(total)}<span>円</span>`;
+    $('total_sets').textContent   = setCount;
+    $('set_sum').textContent      = fmtMoney(setTotal);
+    $('drink_sum').textContent    = fmtMoney(drinkTotal);
+    $('subtotal_summary').textContent = fmtMoney(subtotal);
+    $('service_label').textContent = `サービス料 (${Math.round(activeProfile.serviceRate * 100)}%)`;
+    $('tax_label').textContent = `消費税 (${Math.round(activeProfile.taxRate * 100)}%)`;
+    $('service').textContent      = fmtMoney(service);
+    $('tax').textContent          = fmtMoney(tax);
+    $('grand_total_summary').textContent = fmtMoney(total);
+    $('store-chip').textContent = activeProfile.name;
+    $('status-current-total').textContent = fmtMoney(total);
+
+    updateBudgetUI(total);
+    updateCompare(total);
+    updateStatus(total);
+    saveActiveSession();
+
+    return bill;
+  }
+
+  /* ━━━━━ ① 予算バー ━━━━━ */
+  function setBudget(amount) {
+    budget = amount;
+    if (amount > 0) {
+      $('budget-label-amount').textContent = fmtMoney(amount);
+    }
+    const r = calcTotal();
+    updateBudgetUI(r.total);
+  }
+
+  function loadBudget() {
+    // 毎回入店時に入力するため引き継ぎなし
+  }
+
+  function updateBudgetUI(total) {
+    const wrap = $('budget-bar-wrap');
+    const calc = $('drink-calc-section');
+    if (!budget) {
+      wrap.classList.remove('visible');
+      calc.classList.remove('visible');
+      $('budget-chip').textContent = '予算未設定';
+      $('budget-chip').className = 'status-chip';
+      $('status-budget-left').textContent = '未設定';
+      $('budget-insight').textContent = '予算を入れると安全セット数を表示します';
+      return;
+    }
+    wrap.classList.add('visible');
+    $('budget-label-amount').textContent = fmtMoney(budget);
+
+    const ratio  = Math.min(total / budget, 1);
+    const remain = budget - total;
+    const bar    = $('budget-bar');
+    bar.style.width = (ratio * 100) + '%';
+    bar.className   = ratio >= 1 ? 'danger' : ratio >= 0.8 ? 'warn' : '';
+
+    const remEl = $('budget-remaining-text');
+    if (remain >= 0) {
+      remEl.textContent = `残り ${fmtMoney(remain)}`;
+      remEl.style.color = ratio >= 0.8 ? 'var(--accent-orange)' : 'var(--accent-green)';
+      $('budget-chip').textContent = ratio >= 0.8 ? '予算80%超' : `残り ${fmtMoney(remain)}`;
+      $('budget-chip').className = `status-chip ${ratio >= 0.8 ? 'warn' : 'safe'}`;
+      $('status-budget-left').textContent = fmtMoney(remain);
+    } else {
+      remEl.textContent = `超過 ${fmtMoney(Math.abs(remain))}`;
+      remEl.style.color = 'var(--accent-red)';
+      $('budget-chip').textContent = `予算超過 ${fmtMoney(Math.abs(remain))}`;
+      $('budget-chip').className = 'status-chip danger';
+      $('status-budget-left').textContent = `超過 ${fmtMoney(Math.abs(remain))}`;
+    }
+    $('budget-alert').className = remain < 0 ? 'show' : '';
+
+    const setUnit = Math.round(activeProfile.extensionSetPrice * (1 + activeProfile.serviceRate) * (1 + activeProfile.taxRate) / 100) * 100;
+    const safeSets = remain > 0 && setUnit > 0 ? Math.floor(remain / setUnit) : 0;
+    const safeMinutes = safeSets * activeProfile.setMinutes;
+    $('budget-insight').textContent = remain > 0
+      ? `あと約${safeSets}セット / ${safeMinutes}分は安全圏です`
+      : '予算を超過しています。追加注文前に会計確認してください。';
+
+    /* ② あと何杯 */
+    if (remain > 0) {
+      calc.classList.add('visible');
+      const grid = $('drink-calc-grid');
+      grid.innerHTML = '';
+      CALC_DRINKS.forEach(d => {
+        const costPerDrink = Math.ceil(d.price * (1 + activeProfile.serviceRate) * (1 + activeProfile.taxRate) / 100) * 100;
+        const can = Math.floor(remain / costPerDrink);
+        const el  = document.createElement('div');
+        el.className = 'drink-calc-item';
+        el.innerHTML = `<div class="dc-name">${d.name}</div>
+          <div class="dc-count${can === 0 ? ' ng' : ''}">${can > 0 ? can : '×'}</div>
+          <div class="dc-unit">${can > 0 ? '杯まで可' : '予算不足'}</div>`;
+        grid.appendChild(el);
+      });
+    } else {
+      calc.classList.remove('visible');
+    }
+  }
+
+  /* ━━━━━ ④ 訪問比較 ━━━━━ */
+  function updateCompare(total) {
+    $('compare-current').textContent = fmtMoney(total);
+    const hist = loadHistory();
+    if (!hist.length) {
+      ['compare-avg','compare-diff'].forEach(id => $(id).textContent = '—');
+      ['compare-count','compare-diff-sub'].forEach(id => $(id).textContent = '');
+      return;
+    }
+    const avg  = Math.round(hist.reduce((s, r) => s + r.total, 0) / hist.length);
+    const last = hist[hist.length - 1].total;
+    const diff = total - last;
+    $('compare-avg').textContent   = fmtMoney(avg);
+    $('compare-count').textContent = `${hist.length}回平均`;
+    $('compare-diff').textContent  = diff === 0 ? '±0' : (diff > 0 ? '+' : '') + fmtMoney(diff);
+    $('compare-diff').className    = 'ci-val' + (diff > 0 ? ' up' : diff < 0 ? ' down' : '');
+    $('compare-diff-sub').textContent = `前回 ${fmtMoney(last)}`;
+  }
+
+  function updateStatus(total) {
+    let rem = null;
+    if (tsStart) {
+      const elapsed = (Date.now() - tsStart) + tsPaused;
+      rem = setMs() - (elapsed % setMs());
+    } else if (tsPaused > 0) {
+      rem = setMs() - (tsPaused % setMs());
+    }
+    if (rem !== null) {
+      const rm = Math.floor(rem / MS_M);
+      const rs = Math.floor((rem % MS_M) / MS_S);
+      const text = `${pad(rm)}:${pad(rs)}`;
+      $('status-next-set').textContent = text;
+      $('next-set-chip').textContent = `次セット ${text}`;
+      $('next-set-chip').className = `status-chip ${rm < 5 ? 'danger' : rm < 10 ? 'warn' : 'safe'}`;
+    } else {
+      $('status-next-set').textContent = '--:--';
+      $('next-set-chip').textContent = '次セット --:--';
+      $('next-set-chip').className = 'status-chip';
+    }
+    if (!constraints.checkout) $('status-checkout-total').textContent = '未設定';
+  }
+
+  /* ━━━━━ ③ 退店逆算 ━━━━━ */
+  function updateCheckout() {
+    constraints.checkout = $('checkout-time-input').value;
+    constraints.closing = $('closing-time-input').value;
+    constraints.nextPlan = $('next-plan-time-input').value;
+    const val   = constraints.checkout;
+    const resEl = $('checkout-result');
+    if (!val || !tsStart) {
+      resEl.classList.remove('visible');
+      $('status-checkout-total').textContent = val ? '開始後に表示' : '未設定';
+      updateConstraints();
+      saveActiveSession();
+      return;
+    }
+
+    const now    = new Date();
+    const [hh, mm] = val.split(':').map(Number);
+    const target = new Date(now);
+    target.setHours(hh, mm, 0, 0);
+    if (target <= now) target.setDate(target.getDate() + 1);
+
+    const msLeft = target - now;
+    if (msLeft <= 0) { resEl.classList.remove('visible'); return; }
+    resEl.classList.add('visible');
+
+    const totalMins = Math.floor(msLeft / MS_M);
+    const h = Math.floor(totalMins / 60), m = totalMins % 60;
+    $('co-timeleft').textContent = h > 0 ? `${h}時間${m}分` : `${m}分`;
+
+    const elapsed  = (Date.now() - tsStart) + tsPaused;
+    const remInSet = setMs() - (elapsed % setMs());
+    const msAfter  = msLeft - remInSet;
+    const extra    = msAfter > 0 ? Math.ceil(msAfter / setMs()) : 0;
+
+    $('co-extra-sets').textContent = extra > 0 ? `+${extra}セット` : '追加なし';
+    $('co-extra-sets').className   = 'cr-val ' + (extra > 0 ? 'warn' : 'safe');
+
+    const extraCostTax = extra > 0 ? Math.round(extra * activeProfile.extensionSetPrice * (1 + activeProfile.serviceRate) * (1 + activeProfile.taxRate) / 100) * 100 : 0;
+    $('co-extra-cost').textContent = extra > 0 ? `+${fmtMoney(extraCostTax)}` : '—';
+    $('co-extra-cost').className   = 'cr-val ' + (extra > 0 ? 'warn' : 'safe');
+
+    const rm = Math.floor(remInSet / MS_M), rs = Math.floor((remInSet % MS_M) / MS_S);
+    $('co-next-set').textContent = `${pad(rm)}:${pad(rs)}`;
+    $('co-next-set').className   = 'cr-val ' + (rm < 5 ? 'danger' : 'safe');
+    $('status-checkout-total').textContent = fmtMoney(calcTotal().total + extraCostTax);
+    updateConstraints();
+    saveActiveSession();
+  }
+
+  function timeToTarget(value) {
+    if (!value) return null;
+    const now = new Date();
+    const [hh, mm] = value.split(':').map(Number);
+    const target = new Date(now);
+    target.setHours(hh, mm, 0, 0);
+    if (target <= now) target.setDate(target.getDate() + 1);
+    return target - now;
+  }
+
+  function updateConstraints() {
+    const entries = [
+      ['退店予定', constraints.checkout],
+      ['閉店', constraints.closing],
+      ['終電/次予定', constraints.nextPlan],
+    ].map(([label, value]) => ({ label, value, ms: timeToTarget(value) }))
+      .filter(x => x.ms !== null)
+      .sort((a, b) => a.ms - b.ms);
+    const alert = $('constraint-alert');
+    if (!entries.length) {
+      alert.textContent = '';
+      alert.className = 'constraint-alert';
+      return;
+    }
+    const first = entries[0];
+    const mins = Math.floor(first.ms / MS_M);
+    alert.textContent = `最短制約: ${first.label}まで ${Math.floor(mins / 60)}時間${mins % 60}分`;
+    alert.className = `constraint-alert ${mins < 30 ? 'danger' : mins < 60 ? 'warn' : 'safe'}`;
+  }
+
+  /* ━━━━━ ドリンクUI ━━━━━ */
+  const mainEl  = $('drinkListContainer');
+  const otherEl = $('otherDrinksAccordionContent');
+
+  function mkCard(d) {
+    const qty = drinkQty[d.id] || 0;
+    const el  = document.createElement('div');
+    el.className = 'drink-card' + (qty > 0 ? ' has-items' : '');
+    el.dataset.drinkId = d.id;
+    el.innerHTML = `
+      <div class="drink-item-name" title="${d.name}">${d.name}</div>
+      <div class="drink-item-price">${fmtNum(d.price)}円</div>
+      <div class="drink-qty-row">
+        <button class="qty-btn minus-button" data-id="${d.id}">−</button>
+        <span class="drink-current-quantity">${qty}</span>
+        <button class="qty-btn plus-button" data-id="${d.id}">＋</button>
+      </div>
+      <div class="drink-item-total">${qty > 0 ? fmtMoney(d.price * qty) : ''}</div>`;
+    el.querySelector('.minus-button').addEventListener('click', e => updateQty(e.target.dataset.id, -1));
+    el.querySelector('.plus-button').addEventListener('click',  e => updateQty(e.target.dataset.id,  1));
+    return el;
+  }
+
+  function mkAcc(d) {
+    const qty = drinkQty[d.id] || 0;
+    const el  = document.createElement('div');
+    el.className = 'accordion-item';
+    el.dataset.drinkId = d.id;
+    el.innerHTML = `
+      <div class="accordion-item-info">
+        <div class="accordion-item-name">${d.name}</div>
+        <div class="accordion-item-price">${fmtNum(d.price)}円</div>
+      </div>
+      <div class="accordion-item-control">
+        <button class="plus-button"  data-id="${d.id}">＋</button>
+        <span class="accordion-item-quantity">${qty}</span>
+        <button class="minus-button" data-id="${d.id}">−</button>
+      </div>
+      <span class="accordion-item-total">${qty > 0 ? fmtMoney(d.price * qty) : ''}</span>`;
+    el.querySelector('.minus-button').addEventListener('click', e => updateQty(e.target.dataset.id, -1));
+    el.querySelector('.plus-button').addEventListener('click',  e => updateQty(e.target.dataset.id,  1));
+    return el;
+  }
+
+  function mkCustom(id, name, price) {
+    const qty = drinkQty[id] || 0;
+    const el  = document.createElement('div');
+    el.className = 'accordion-item custom-drink-item';
+    el.dataset.drinkId = id;
+    el.innerHTML = `
+      <div class="accordion-item-info">
+        <input type="text"   class="custom-drink-name-input"  value="${name}"        placeholder="ドリンク名">
+        <div class="custom-input-row">
+          <input type="number" class="custom-drink-price-input" value="${price || ''}" placeholder="金額" min="0">
+          <span>円</span>
+        </div>
+      </div>
+      <div class="accordion-item-control">
+        <button class="plus-button"  data-id="${id}">＋</button>
+        <span class="accordion-item-quantity">${qty}</span>
+        <button class="minus-button" data-id="${id}">−</button>
+      </div>
+      <span class="accordion-item-total">${qty > 0 && price > 0 ? fmtMoney(price * qty) : ''}</span>`;
+    el.querySelector('.custom-drink-name-input').addEventListener('input', e => { customDefs[id].name = e.target.value; saveActiveSession(); });
+    el.querySelector('.custom-drink-price-input').addEventListener('input', e => {
+      customDefs[id].price = parseInt(e.target.value) || 0;
+      updateQty(id, 0);
+      saveActiveSession();
+    });
+    el.querySelector('.minus-button').addEventListener('click', e => updateQty(e.target.dataset.id, -1));
+    el.querySelector('.plus-button').addEventListener('click',  e => updateQty(e.target.dataset.id,  1));
+    return el;
+  }
+
+  function renderDrinks() {
+    mainEl.innerHTML = '';
+    const ndc = $('newDrinkRowsContainer');
+    if (ndc) ndc.innerHTML = '';
+
+    DRINKS.filter(d => d.type === 'main').forEach(d => {
+      drinkQty[d.id] = drinkQty[d.id] || 0;
+      mainEl.appendChild(mkCard(d));
+    });
+    DRINKS.filter(d => d.type === 'other').forEach(d => {
+      drinkQty[d.id] = drinkQty[d.id] || 0;
+      if (ndc) ndc.appendChild(mkAcc(d));
+    });
+    Object.keys(customDefs).forEach(id => {
+      drinkQty[id] = drinkQty[id] || 0;
+      if (ndc) ndc.appendChild(mkCustom(id, customDefs[id].name, customDefs[id].price));
+    });
+    const addBtn = $('addNewDrinkRowButton');
+    if (addBtn) addBtn.onclick = addCustom;
+    calcTotal();
+  }
+
+  function updateQty(id, delta, options = {}) {
+    const before = drinkQty[id] || 0;
+    drinkQty[id] = Math.max(0, (drinkQty[id] || 0) + delta);
+    const qty = drinkQty[id];
+    const def = DRINKS.find(d => d.id === id) || customDefs[id];
+    if (!def) return;
+
+    const card = mainEl.querySelector(`.drink-card[data-drink-id="${id}"]`);
+    const acc  = otherEl.querySelector(`.accordion-item[data-drink-id="${id}"]`);
+
+    if (card) {
+      card.querySelector('.drink-current-quantity').textContent = qty;
+      card.querySelector('.drink-item-total').textContent = qty > 0 ? fmtMoney(def.price * qty) : '';
+      card.classList.toggle('has-items', qty > 0);
+    } else if (acc) {
+      acc.querySelector('.accordion-item-quantity').textContent = qty;
+      let price = def.price;
+      if (acc.classList.contains('custom-drink-item'))
+        price = parseInt(acc.querySelector('.custom-drink-price-input').value) || 0;
+      acc.querySelector('.accordion-item-total').textContent = qty > 0 && price > 0 ? fmtMoney(price * qty) : '';
+    }
+    calcTotal();
+    if (delta !== 0 && !options.silent) {
+      lastAction = { type: 'qty', id, before, after: qty, name: def.name || '項目' };
+      showUndo(`${def.name || '項目'}を${delta > 0 ? '追加' : '削除'}しました`);
+    }
+    saveActiveSession();
+  }
+
+  function addCustom() {
+    if (customCount >= MAX_CUSTOM) { alert(`カスタムドリンクは${MAX_CUSTOM}個まで`); return; }
+    customCount++;
+    const id = `custom_${Date.now()}`;
+    customDefs[id] = { id, name: '', price: 0 };
+    drinkQty[id]   = 0;
+    const ndc = $('newDrinkRowsContainer');
+    if (ndc) ndc.appendChild(mkCustom(id, '', 0));
+    calcTotal();
+    saveActiveSession();
+  }
+
+  function showUndo(message) {
+    const toast = $('undo-toast');
+    $('undo-message').textContent = message;
+    toast.classList.add('show');
+    clearTimeout(undoTimer);
+    undoTimer = setTimeout(() => toast.classList.remove('show'), 4500);
+  }
+
+  function undoLastAction() {
+    if (!lastAction || lastAction.type !== 'qty') return;
+    const current = drinkQty[lastAction.id] || 0;
+    const delta = lastAction.before - current;
+    updateQty(lastAction.id, delta, { silent: true });
+    $('undo-toast').classList.remove('show');
+    lastAction = null;
+  }
+
+  function showConfirm(title, message, onOk) {
+    pendingConfirm = onOk;
+    $('confirm-title').textContent = title;
+    $('confirm-message').textContent = message;
+    $('confirm-sheet').classList.add('show');
+    $('confirm-sheet').setAttribute('aria-hidden', 'false');
+  }
+
+  function hideConfirm() {
+    pendingConfirm = null;
+    $('confirm-sheet').classList.remove('show');
+    $('confirm-sheet').setAttribute('aria-hidden', 'true');
+  }
+
+  /* ━━━━━ タイマー永続化 ━━━━━ */
+  function saveTimer() {
+    localStorage.setItem(KEY_TIMER, JSON.stringify({ tsStart, tsPaused, isRunning: tsStart !== null }));
+    saveActiveSession();
+  }
+  function clearTimer() { localStorage.removeItem(KEY_TIMER); }
+
+  function saveActiveSession() {
+    AppCore.saveSession({
+      profileId: activeProfile.id,
+      drinkQty,
+      customDefs,
+      customCount,
+      timer: { tsStart, tsPaused, isRunning: timerId !== null, setCount },
+      budget,
+      constraints,
+      form: {
+        storeName: $('visit-store-name')?.value || '',
+        castName: $('visit-cast-name')?.value || '',
+        nominated: $('visit-nominated')?.checked || false,
+        satisfaction: $('visit-satisfaction')?.value || '',
+        actualTotal: $('visit-actual-total')?.value || '',
+        memo: $('visit-memo')?.value || '',
+      },
+    });
+  }
+
+  function loadActiveSession() {
+    const session = AppCore.loadSession();
+    if (!session) return false;
+    if (session.profileId) {
+      AppCore.setActiveProfile(session.profileId);
+      activeProfile = AppCore.getActiveProfile();
+      DRINKS = activeProfile.drinks;
+      CALC_DRINKS = activeProfile.drinks.slice(0, 4);
+    }
+    drinkQty = session.drinkQty || {};
+    customDefs = session.customDefs || {};
+    customCount = session.customCount || Object.keys(customDefs).length;
+    budget = Number(session.budget) || 0;
+    constraints = Object.assign({ checkout: '', closing: '', nextPlan: '' }, session.constraints || {});
+    if (budget > 0) $('budget-input').value = budget;
+    $('checkout-time-input').value = constraints.checkout || '';
+    $('closing-time-input').value = constraints.closing || '';
+    $('next-plan-time-input').value = constraints.nextPlan || '';
+    if (session.form) {
+      $('visit-store-name').value = session.form.storeName || '';
+      $('visit-cast-name').value = session.form.castName || '';
+      $('visit-nominated').checked = Boolean(session.form.nominated);
+      $('visit-satisfaction').value = session.form.satisfaction || '';
+      $('visit-actual-total').value = session.form.actualTotal || '';
+      $('visit-memo').value = session.form.memo || '';
+    }
+    if (session.timer) {
+      tsPaused = session.timer.tsPaused || 0;
+      setCount = session.timer.setCount || 0;
+      if (session.timer.isRunning && session.timer.tsStart) {
+        tsStart = session.timer.tsStart;
+        $('start').textContent = new Date(tsStart).toLocaleTimeString('ja-JP');
+        timerId = setInterval(tick, 1000);
+      } else {
+        tsStart = null;
+      }
+    }
+    return true;
+  }
+
+  function loadTimer() {
+    try {
+      const raw = localStorage.getItem(KEY_TIMER);
+      if (!raw) return;
+      const s = JSON.parse(raw);
+      tsPaused = s.tsPaused || 0;
+      if (s.isRunning && s.tsStart) {
+        tsStart   = s.tsStart;
+        $('start').textContent = new Date(tsStart).toLocaleTimeString('ja-JP');
+        const elapsed = (Date.now() - tsStart) + tsPaused;
+        setCount = Math.max(1, Math.floor(elapsed / setMs()) + 1);
+        timerId  = setInterval(tick, 1000);
+        tick(); calcTotal();
+      } else if (!s.isRunning && tsPaused > 0) {
+        const elapsed = tsPaused;
+        setCount = Math.max(1, Math.floor(elapsed / setMs()) + 1);
+        $('elapsed_time').textContent = fmtMs(elapsed);
+        const rem = setMs() - (elapsed % setMs());
+        $('remaining').textContent = `${pad(Math.floor(rem/MS_M))}:${pad(Math.floor((rem%MS_M)/MS_S))}`;
+        $('start').textContent = new Date(Date.now() - elapsed).toLocaleTimeString('ja-JP');
+        calcTotal();
+      }
+    } catch(e) {}
+  }
+
+  /* ━━━━━ タイマー ━━━━━ */
+  function tick() {
+    const now = new Date();
+    $('now').textContent = now.toLocaleTimeString('ja-JP');
+    if (!tsStart) return;
+
+    const elapsed = (now.getTime() - tsStart) + tsPaused;
+    $('elapsed_time').textContent = fmtMs(elapsed);
+
+    const newSet = Math.max(1, Math.floor(elapsed / setMs()) + 1);
+    if (newSet !== setCount) { setCount = newSet; calcTotal(); }
+
+    const rem = setMs() - (elapsed % setMs());
+    const rm  = Math.floor(rem / MS_M);
+    const rs  = Math.floor((rem % MS_M) / MS_S);
+    $('remaining').textContent = `${pad(rm)}:${pad(rs)}`;
+    $('remaining').classList.toggle('alert', rm < 5 && setCount > 0);
+
+    updateCheckout();
+  }
+
+  function startTimer() {
+    if (timerId) return;
+    const now = Date.now();
+    if (!tsStart && tsPaused === 0) {
+      tsStart = now; tsPaused = 0; setCount = 1;
+      $('start').textContent = new Date(now).toLocaleTimeString('ja-JP');
+    } else {
+      tsStart = now;
+    }
+    timerId = setInterval(tick, 1000);
+    tick(); calcTotal(); saveTimer();
+  }
+
+  function pauseTimer() {
+    if (!timerId) return;
+    clearInterval(timerId); timerId = null;
+    if (tsStart) { tsPaused += Date.now() - tsStart; tsStart = null; }
+    saveTimer();
+  }
+
+  function endTimer() {
+    pauseTimer();
+    $('start').textContent = $('elapsed_time').textContent = '--';
+    $('remaining').textContent = '--:--';
+    $('remaining').classList.remove('alert');
+    tsStart = null; tsPaused = 0; setCount = 0;
+    clearTimer(); calcTotal();
+    $('checkout-result').classList.remove('visible');
+  }
+
+  function resetAll() {
+    showConfirm('会計リセット', 'タイマー、ドリンク、当日セッションをリセットします。履歴は残ります。', () => {
+      endTimer();
+      drinkQty = {}; customDefs = {}; customCount = 0; budget = 0;
+      $('budget-input').value = '';
+      constraints = { checkout: '', closing: '', nextPlan: '' };
+      $('checkout-time-input').value = '';
+      $('closing-time-input').value = '';
+      $('next-plan-time-input').value = '';
+      AppCore.clearSession();
+      renderDrinks(); calcTotal();
+    });
+  }
+
+  /* ━━━━━ 履歴 ━━━━━ */
+  function loadHistory() {
+    return AppCore.migrateHistory();
+  }
+
+  function renderHistory() {
+    const hist = loadHistory();
+    const list = $('history-list');
+    if (!hist.length) { list.innerHTML = '<div class="history-empty">履歴はまだありません</div>'; return; }
+    list.innerHTML = '';
+    [...hist].reverse().forEach(rec => {
+      const d = new Date(rec.timestamp);
+      const ds = `${d.getFullYear()}/${pad(d.getMonth()+1)}/${pad(d.getDate())} ${d.toLocaleTimeString('ja-JP')}`;
+      const diff = (rec.actualTotal || rec.total) - (rec.predictedTotal || rec.total);
+      const el = document.createElement('div');
+      el.className = 'history-item';
+      el.dataset.id = rec.id;
+      el.innerHTML = `
+        <div class="history-item-header">
+          <div>
+            <div class="history-item-date">${ds}</div>
+            <div class="history-store">${rec.storeName || '未設定'}${rec.castName ? ' / ' + rec.castName : ''}</div>
+          </div>
+          <div class="history-item-total">${fmtMoney(rec.actualTotal || rec.total)}</div>
+        </div>
+        <div class="history-item-detail">${rec.sets}セット ／ ドリンク ${fmtMoney(rec.drinkTotal)} ／ 予測差 ${diff === 0 ? '±0' : (diff > 0 ? '+' : '') + fmtMoney(diff)}</div>
+        <details class="history-note">
+          <summary>メモ</summary>
+          <div>満足度: ${rec.satisfaction || '未選択'} / 指名: ${rec.nominated ? 'あり' : 'なし'}</div>
+          <div>${rec.memo || 'メモなし'}</div>
+        </details>
+        <div class="history-actions">
+          <button type="button" data-action="copy">複製して開始</button>
+          <button type="button" data-action="sim">シミュへ転用</button>
+          <button type="button" data-action="edit">編集</button>
+        </div>`;
+      list.appendChild(el);
+    });
+  }
+
+  function saveBill() {
+    const r = calcTotal();
+    if (r.total === 0) { alert('合計が0円です'); return; }
+    const hist = loadHistory();
+    const actual = parseInt($('visit-actual-total').value) || r.total;
+    hist.push({
+      id: `hist_${Date.now()}`,
+      version: AppCore.APP_VERSION,
+      timestamp: Date.now(),
+      total: actual,
+      predictedTotal: r.total,
+      actualTotal: actual,
+      difference: actual - r.total,
+      sets: r.setCount,
+      drinkTotal: r.drinkTotal,
+      storeName: $('visit-store-name').value || activeProfile.name,
+      castName: $('visit-cast-name').value || '',
+      nominated: $('visit-nominated').checked,
+      satisfaction: $('visit-satisfaction').value,
+      memo: $('visit-memo').value,
+      profileSnapshot: AppCore.snapshotProfile(activeProfile),
+      items: r.rows,
+      session: { drinkQty: AppCore.clone(drinkQty), customDefs: AppCore.clone(customDefs), customCount, setCount },
+    });
+    if (hist.length > 50) hist.shift();
+    localStorage.setItem(KEY_HIST, JSON.stringify(hist));
+    renderHistory(); updateCompare(r.total);
+    const btn = $('saveHistoryBtn'), orig = btn.textContent;
+    btn.textContent = '✓ 保存完了！';
+    btn.style.background = 'linear-gradient(135deg,#27ae60,#2ecc71)';
+    setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 1500);
+  }
+
+  function handleHistoryAction(e) {
+    const btn = e.target.closest('button[data-action]');
+    if (!btn) return;
+    const item = btn.closest('.history-item');
+    const rec = loadHistory().find(r => r.id === item.dataset.id);
+    if (!rec) return;
+    if (btn.dataset.action === 'copy') {
+      showConfirm('履歴から開始', '現在の会計内容を履歴の内容で置き換えます。', () => {
+        if (rec.profileSnapshot?.id) {
+          activeProfile = rec.profileSnapshot;
+          DRINKS = activeProfile.drinks || DRINKS;
+          CALC_DRINKS = DRINKS.slice(0, 4);
+        }
+        drinkQty = AppCore.clone(rec.session?.drinkQty || {});
+        customDefs = AppCore.clone(rec.session?.customDefs || {});
+        customCount = rec.session?.customCount || Object.keys(customDefs).length;
+        setCount = rec.session?.setCount || rec.sets || 0;
+        renderDrinks();
+        calcTotal();
+      });
+    }
+    if (btn.dataset.action === 'sim') {
+      AppCore.write('simulation_seed', rec);
+      location.href = 'simulation.html?from=history';
+    }
+    if (btn.dataset.action === 'edit') {
+      const actual = prompt('実請求額を入力してください', rec.actualTotal || rec.total);
+      if (actual === null) return;
+      rec.actualTotal = parseInt(actual) || rec.actualTotal || rec.total;
+      rec.total = rec.actualTotal;
+      rec.difference = rec.actualTotal - (rec.predictedTotal || rec.total);
+      localStorage.setItem(KEY_HIST, JSON.stringify(loadHistory().map(r => r.id === rec.id ? rec : r)));
+      renderHistory();
+      updateCompare(calcTotal().total);
+    }
+  }
+
+  /* ━━━━━ アコーディオン ━━━━━ */
+  function setupAccordion() {
+    const h = $('otherDrinksAccordionHeader'), c = $('otherDrinksAccordionContent');
+    h.addEventListener('click', () => { h.classList.toggle('active'); c.classList.toggle('open'); });
+  }
+
+  /* ━━━━━ Service Worker ━━━━━ */
+  function showUpdateBar() {
+    const n = $('updateNotification'); if (n) n.style.display = 'block';
+    const b = $('updateButton');
+    if (b) b.addEventListener('click', () => { if (swNewWorker) swNewWorker.postMessage({ action: 'skipWaiting' }); });
+  }
+
+  /* ━━━━━ 初期化 ━━━━━ */
+  document.addEventListener('DOMContentLoaded', () => {
+    loadBudget();
+    const restored = loadActiveSession();
+    $('visit-store-name').value = $('visit-store-name').value || activeProfile.name;
+    renderDrinks();
+    setupAccordion();
+    calcTotal();
+    renderHistory();
+    if (!restored) loadTimer();
+    if (timerId) tick();
+
+    $('checkout-time-input').addEventListener('change', updateCheckout);
+    $('checkout-time-input').addEventListener('input', updateCheckout);
+    $('closing-time-input').addEventListener('change', updateCheckout);
+    $('closing-time-input').addEventListener('input', updateCheckout);
+    $('next-plan-time-input').addEventListener('change', updateCheckout);
+    $('next-plan-time-input').addEventListener('input', updateCheckout);
+    $('pauseButton').addEventListener('click', pauseTimer);
+    $('endButton').addEventListener('click', endTimer);
+    $('resetTimerButton').addEventListener('click', () => {
+      showConfirm('タイマーリセット', '時間だけをリセットします。ドリンク数量は残ります。', endTimer);
+    });
+    $('resetAllButton').addEventListener('click', resetAll);
+    $('saveHistoryBtn').addEventListener('click', saveBill);
+    $('history-list').addEventListener('click', handleHistoryAction);
+    $('undo-button').addEventListener('click', undoLastAction);
+    $('confirm-cancel').addEventListener('click', hideConfirm);
+    $('confirm-ok').addEventListener('click', () => {
+      const fn = pendingConfirm;
+      hideConfirm();
+      if (fn) fn();
+    });
+    $('confirm-sheet').addEventListener('click', e => { if (e.target.id === 'confirm-sheet') hideConfirm(); });
+
+    document.querySelectorAll('.quick-add-bar button').forEach(btn => {
+      btn.addEventListener('click', () => updateQty(btn.dataset.quickId, 1));
+    });
+    document.querySelectorAll('.save-form input, .save-form select, .save-form textarea').forEach(el => {
+      el.addEventListener('input', saveActiveSession);
+      el.addEventListener('change', saveActiveSession);
+    });
+
+    $('budget-set-btn').addEventListener('click', () => {
+      const v = parseInt($('budget-input').value);
+      if (!v || v <= 0) { alert('正しい金額を入力してください'); return; }
+      setBudget(v);
+      saveActiveSession();
+    });
+    $('budget-input').addEventListener('keydown', e => { if (e.key === 'Enter') $('budget-set-btn').click(); });
+    $('budget-clear-btn').addEventListener('click', () => {
+      budget = 0; $('budget-input').value = '';
+      $('budget-bar-wrap').classList.remove('visible');
+      $('drink-calc-section').classList.remove('visible');
+      calcTotal();
+      saveActiveSession();
+    });
+
+    $('startButton').addEventListener('click', startTimer);
+
+    $('clearHistoryBtn').addEventListener('click', () => {
+      showConfirm('履歴全削除', '保存済みの会計履歴をすべて削除します。この操作は戻せません。', () => {
+        localStorage.removeItem(KEY_HIST);
+        renderHistory(); updateCompare(0);
+      });
+    });
+
+    document.addEventListener('touchend', e => { if (e.detail > 1) e.preventDefault(); }, { passive: false });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js?v=2.16', { updateViaCache: 'none' })
+          .then(reg => {
+            reg.update();
+            reg.addEventListener('updatefound', () => {
+              swNewWorker = reg.installing;
+              swNewWorker.addEventListener('statechange', () => {
+                if (swNewWorker.state === 'installed' && navigator.serviceWorker.controller) showUpdateBar();
+              });
+            });
+          }).catch(e => console.log('SW:', e));
+        navigator.serviceWorker.addEventListener('controllerchange', () => window.location.reload());
+      });
+    }
+  });
+
+  setInterval(() => { $('now').textContent = new Date().toLocaleTimeString('ja-JP'); }, 1000);
+})();
+</script>
+</body>
+</html>

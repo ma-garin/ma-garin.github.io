@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>メニュー画面</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: var(--font);
+      margin: 0;
+      padding: 0 12px 24px;
+      background: var(--bg);
+      color: var(--text-1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    h2 {
+      text-align: center;
+      margin: 0 0 24px;
+      color: var(--primary);
+      font-size: 1.25rem;
+      letter-spacing: 0.06em;
+    }
+
+    .container,
+    .menu-content {
+      max-width: 500px;
+      width: 100%;
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+    }
+
+    .container {
+      padding: 24px 16px 18px;
+      text-align: center;
+      margin: 18px 0 12px;
+    }
+
+    .menu-item { margin-bottom: 12px; }
+    .menu-item:last-child { margin-bottom: 0; }
+
+    .menu-item a {
+      display: block;
+      background: var(--primary);
+      color: var(--primary-on);
+      text-decoration: none;
+      padding: 13px 16px;
+      border-radius: var(--radius);
+      font-size: 0.95rem;
+      font-weight: 700;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .menu-item a:hover {
+      opacity: 0.88;
+      transform: translateY(-1px);
+    }
+
+    .menu-content {
+      padding: 16px;
+      margin-top: 0;
+    }
+
+    .menu-category { margin-bottom: 22px; }
+    .menu-category:last-child { margin-bottom: 0; }
+
+    .menu-category h3 {
+      background: var(--surface-hi);
+      color: var(--text-1);
+      padding: 10px 12px;
+      border-radius: var(--radius);
+      margin: 0 0 10px;
+      font-size: 0.82rem;
+      letter-spacing: 0.12em;
+      text-align: left;
+    }
+
+    .menu-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .menu-list li {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 4px;
+      border-bottom: 1px solid var(--divider);
+      font-size: 0.92rem;
+    }
+
+    .menu-list li:last-child { border-bottom: none; }
+
+    .menu-item-name {
+      font-weight: 700;
+      color: var(--text-1);
+      flex-grow: 1;
+      text-align: left;
+    }
+
+    .menu-item-price {
+      font-weight: 700;
+      color: var(--primary);
+      text-align: right;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    #updateNotification {
+      display: none;
+      text-align: center;
+      padding: 10px 14px;
+      background: rgba(130,170,204,0.1);
+      border: 1px solid rgba(130,170,204,0.35);
+      color: var(--primary);
+      margin-top: 16px;
+      margin-bottom: 12px;
+      border-radius: var(--radius);
+      font-size: 0.82rem;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    #updateNotification button {
+      background: var(--primary);
+      color: var(--primary-on);
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      margin-left: 8px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    @media (min-width: 600px) {
+      .container, .menu-content { padding: 24px; }
+    }
+  </style>
+  <link rel="stylesheet" href="theme.css?v=2.16">
+  <script src="app-core.js?v=2.16"></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>メニュー</h1>
+      <div class="subtitle">Drink &amp; Champagne Menu</div>
+    </header>
+
+    <div id="updateNotification">
+      v2.16 の更新があります <button id="updateButton">今すぐ更新</button>
+    </div>
+
+  <div class="menu-content card">
+    <div class="menu-category">
+      <h3>検索</h3>
+      <input id="menu-search" class="filter-input" type="search" placeholder="メニュー検索">
+      <div class="price-filter-row" id="price-filter-row" style="margin-top:10px;">
+        <button type="button" class="active" data-max="all">すべて</button>
+        <button type="button" data-max="3000">〜3千</button>
+        <button type="button" data-max="50000">〜5万</button>
+        <button type="button" data-max="999999">高額</button>
+      </div>
+    </div>
+
+    <div class="menu-category" data-category="drinks">
+      <button class="category-toggle" type="button" data-toggle="drink-list">ドリンク</button>
+      <ul class="menu-list" id="drink-list"></ul>
+    </div>
+
+    <div class="menu-category" data-category="champagnes">
+      <button class="category-toggle" type="button" data-toggle="champagne-list">シャンパン</button>
+      <ul class="menu-list" id="champagne-list"></ul>
+    </div>
+
+    <div class="menu-category">
+      <h3>シャンパン総額</h3>
+      <div class="budget-insight" id="champagne-mini-sim">シャンパンを選ぶと概算総額を表示します</div>
+    </div>
+  </div>
+</div>
+
+  <nav class="bottom-tabs" aria-label="画面切り替え">
+    <a class="bottom-tab" href="index.html">会計</a>
+    <a class="bottom-tab" href="simulation.html">シミュ</a>
+    <button class="bottom-tab tab-current" type="button" disabled>メニュー</button>
+    <a class="bottom-tab" href="settings.html">設定</a>
+  </nav>
+
+  <script>
+    const profile = AppCore.getActiveProfile();
+    let currentFilter = 'all';
+
+    function yen(n) { return '¥' + Number(n || 0).toLocaleString(); }
+
+    function currentBaseTotal() {
+      const session = AppCore.loadSession();
+      if (!session) return 0;
+      const bill = AppCore.calculateBill(profile, session.timer?.setCount || 0, session.drinkQty || {}, session.customDefs || {}, {});
+      return bill.total;
+    }
+
+    function passesFilter(item) {
+      const query = document.getElementById('menu-search').value.trim().toLowerCase();
+      const matchQuery = !query || item.name.toLowerCase().includes(query);
+      const max = currentFilter === 'all' ? Infinity : Number(currentFilter);
+      const matchPrice = currentFilter === '999999' ? item.price > 50000 : item.price <= max;
+      return matchQuery && matchPrice;
+    }
+
+    function renderList(listId, items, champagne) {
+      const ul = document.getElementById(listId);
+      const rows = items.filter(passesFilter);
+      ul.innerHTML = rows.length ? rows.map(item => `
+        <li data-price="${item.price}" data-name="${item.name}">
+          <span>
+            <span class="menu-item-name">${item.name}</span>
+            <span class="menu-note">${item.note || 'メモなし'}</span>
+          </span>
+          <button type="button" class="menu-item-price" data-champagne="${champagne ? item.id : ''}">${yen(item.price)}</button>
+        </li>
+      `).join('') : '<li><span class="menu-item-name">該当なし</span><span class="menu-item-price">—</span></li>';
+    }
+
+    function renderMenus() {
+      renderList('drink-list', profile.drinks, false);
+      renderList('champagne-list', profile.champagnes, true);
+    }
+
+    function showChampagneTotal(id) {
+      const ch = profile.champagnes.find(item => item.id === id);
+      if (!ch) return;
+      const base = currentBaseTotal();
+      const subtotal = ch.price;
+      const service = Math.floor(subtotal * profile.serviceRate);
+      const tax = Math.floor((subtotal + service) * profile.taxRate);
+      const add = Math.round((subtotal + service + tax) / 100) * 100;
+      document.getElementById('champagne-mini-sim').textContent = `${ch.name}を入れると、現在会計から概算 ${yen(base + add)}（追加 ${yen(add)}）`;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderMenus();
+      document.getElementById('menu-search').addEventListener('input', renderMenus);
+      document.getElementById('price-filter-row').addEventListener('click', e => {
+        const btn = e.target.closest('button[data-max]');
+        if (!btn) return;
+        currentFilter = btn.dataset.max;
+        document.querySelectorAll('#price-filter-row button').forEach(b => b.classList.toggle('active', b === btn));
+        renderMenus();
+      });
+      document.querySelectorAll('.category-toggle').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const list = document.getElementById(btn.dataset.toggle);
+          list.hidden = !list.hidden;
+        });
+      });
+      document.getElementById('champagne-list').addEventListener('click', e => {
+        const btn = e.target.closest('[data-champagne]');
+        if (btn && btn.dataset.champagne) showChampagneTotal(btn.dataset.champagne);
+      });
+    });
+
+    // Service Workerの更新通知と処理 (index.htmlと共通)
+    let serviceWorkerNewWorker; // Service Workerの新しいインスタンスを保持
+
+    function showUpdateBar() {
+      const updateNotification = document.getElementById('updateNotification');
+      const updateButton = document.getElementById('updateButton');
+
+      if (updateNotification && updateButton) {
+        updateNotification.style.display = 'block';
+        updateButton.addEventListener('click', () => {
+          if (serviceWorkerNewWorker) {
+            serviceWorkerNewWorker.postMessage({ action: 'skipWaiting' }); // Service Workerに更新を指示
+          }
+        });
+      }
+    }
+
+    // Service Workerの登録部分にイベントリスナーを追加 (index.htmlと共通)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js?v=2.16', { updateViaCache: 'none' })
+          .then(reg => {
+            console.log('ServiceWorker registration successful with scope: ', reg.scope);
+            reg.update();
+
+            reg.addEventListener('updatefound', () => {
+              serviceWorkerNewWorker = reg.installing; // 新しいService Workerを保存
+
+              serviceWorkerNewWorker.addEventListener('statechange', () => {
+                if (serviceWorkerNewWorker.state === 'installed') {
+                  if (navigator.serviceWorker.controller) {
+                    showUpdateBar(); // 更新ボタンを表示
+                  }
+                }
+              });
+            });
+          })
+          .catch(err => {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+
+        // 新しいService Workerがアクティブ化されたらページをリロード
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          window.location.reload();
+        });
+      });
+    }
+  </script>
+</body>
+</html>
