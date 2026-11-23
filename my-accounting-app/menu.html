@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>メニュー画面</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -150,7 +150,7 @@
       .container, .menu-content { padding: 24px; }
     }
   </style>
-  <link rel="stylesheet" href="theme.css?v=2.17">
+  <link rel="stylesheet" href="theme.css?v=2.18">
   <script src="app-core.js?v=2.16"></script>
 </head>
 <body>
@@ -161,7 +161,7 @@
     </header>
 
     <div id="updateNotification">
-      v2.17 の更新があります <button id="updateButton">今すぐ更新</button>
+      v2.18 の更新があります <button id="updateButton">今すぐ更新</button>
     </div>
 
   <div class="menu-content card">
@@ -294,7 +294,7 @@
     // Service Workerの登録部分にイベントリスナーを追加 (index.htmlと共通)
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js?v=2.17', { updateViaCache: 'none' })
+        navigator.serviceWorker.register('./service-worker.js?v=2.18', { updateViaCache: 'none' })
           .then(reg => {
             console.log('ServiceWorker registration successful with scope: ', reg.scope);
             reg.update();

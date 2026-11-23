@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>金額シミュレーション</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -290,7 +290,7 @@
       font-weight: 700;
     }
   </style>
-  <link rel="stylesheet" href="theme.css?v=2.17">
+  <link rel="stylesheet" href="theme.css?v=2.18">
   <script src="app-core.js?v=2.16"></script>
 </head>
 <body>
@@ -301,7 +301,7 @@
   </header>
 
   <div id="updateNotification">
-    v2.17 の更新があります <button id="updateButton">今すぐ更新</button>
+    v2.18 の更新があります <button id="updateButton">今すぐ更新</button>
   </div>
 
   <!-- 合計金額 -->
@@ -825,7 +825,7 @@
 
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js?v=2.17', { updateViaCache: 'none' })
+        navigator.serviceWorker.register('./service-worker.js?v=2.18', { updateViaCache: 'none' })
           .then(reg => {
             reg.update();
             reg.addEventListener('updatefound', () => {
