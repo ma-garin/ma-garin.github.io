@@ -376,7 +376,7 @@
       .compare-grid { grid-template-columns: 1fr 1fr; }
     }
   </style>
-  <link rel="stylesheet" href="theme.css?v=2.16">
+  <link rel="stylesheet" href="theme.css?v=2.17">
   <script src="app-core.js?v=2.16"></script>
 </head>
 <body class="has-quick-add">
@@ -388,7 +388,7 @@
   </header>
 
   <div id="updateNotification">
-    v2.16 の更新があります <button id="updateButton">今すぐ更新</button>
+    v2.17 の更新があります <button id="updateButton">今すぐ更新</button>
   </div>
 
   <!-- 現在合計 + 予算バー + あと何杯 -->
@@ -545,6 +545,7 @@
   <button class="bottom-tab tab-current" type="button" disabled>会計</button>
   <a class="bottom-tab" href="simulation.html">シミュ</a>
   <a class="bottom-tab" href="menu.html">メニュー</a>
+  <a class="bottom-tab" href="analytics.html">分析</a>
   <a class="bottom-tab" href="settings.html">設定</a>
 </nav>
 
@@ -582,6 +583,7 @@
   const pad = n  => String(n).padStart(2, '0');
   const fmtMoney = n => '¥' + n.toLocaleString();
   const fmtNum   = n => n.toLocaleString();
+  const esc = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
   const fmtMs    = ms => {
     const s = Math.floor(ms / 1000);
     return `${pad(Math.floor(s/3600))}:${pad(Math.floor((s%3600)/60))}:${pad(s%60)}`;
@@ -1172,15 +1174,15 @@
         <div class="history-item-header">
           <div>
             <div class="history-item-date">${ds}</div>
-            <div class="history-store">${rec.storeName || '未設定'}${rec.castName ? ' / ' + rec.castName : ''}</div>
+            <div class="history-store">${esc(rec.storeName || '未設定')}${rec.castName ? ' / ' + esc(rec.castName) : ''}</div>
           </div>
           <div class="history-item-total">${fmtMoney(rec.actualTotal || rec.total)}</div>
         </div>
-        <div class="history-item-detail">${rec.sets}セット ／ ドリンク ${fmtMoney(rec.drinkTotal)} ／ 予測差 ${diff === 0 ? '±0' : (diff > 0 ? '+' : '') + fmtMoney(diff)}</div>
+        <div class="history-item-detail">${esc(rec.sets)}セット ／ ドリンク ${fmtMoney(rec.drinkTotal)} ／ 予測差 ${diff === 0 ? '±0' : (diff > 0 ? '+' : '') + fmtMoney(diff)}</div>
         <details class="history-note">
           <summary>メモ</summary>
-          <div>満足度: ${rec.satisfaction || '未選択'} / 指名: ${rec.nominated ? 'あり' : 'なし'}</div>
-          <div>${rec.memo || 'メモなし'}</div>
+          <div>満足度: ${esc(rec.satisfaction || '未選択')} / 指名: ${rec.nominated ? 'あり' : 'なし'}</div>
+          <div>${esc(rec.memo || 'メモなし')}</div>
         </details>
         <div class="history-actions">
           <button type="button" data-action="copy">複製して開始</button>
@@ -1345,7 +1347,7 @@
 
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js?v=2.16', { updateViaCache: 'none' })
+        navigator.serviceWorker.register('./service-worker.js?v=2.17', { updateViaCache: 'none' })
           .then(reg => {
             reg.update();
             reg.addEventListener('updatefound', () => {

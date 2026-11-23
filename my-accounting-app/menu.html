@@ -150,7 +150,7 @@
       .container, .menu-content { padding: 24px; }
     }
   </style>
-  <link rel="stylesheet" href="theme.css?v=2.16">
+  <link rel="stylesheet" href="theme.css?v=2.17">
   <script src="app-core.js?v=2.16"></script>
 </head>
 <body>
@@ -161,7 +161,7 @@
     </header>
 
     <div id="updateNotification">
-      v2.16 の更新があります <button id="updateButton">今すぐ更新</button>
+      v2.17 の更新があります <button id="updateButton">今すぐ更新</button>
     </div>
 
   <div class="menu-content card">
@@ -197,7 +197,8 @@
     <a class="bottom-tab" href="index.html">会計</a>
     <a class="bottom-tab" href="simulation.html">シミュ</a>
     <button class="bottom-tab tab-current" type="button" disabled>メニュー</button>
-    <a class="bottom-tab" href="settings.html">設定</a>
+    <a class="bottom-tab" href="analytics.html">分析</a>
+  <a class="bottom-tab" href="settings.html">設定</a>
   </nav>
 
   <script>
@@ -293,7 +294,7 @@
     // Service Workerの登録部分にイベントリスナーを追加 (index.htmlと共通)
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js?v=2.16', { updateViaCache: 'none' })
+        navigator.serviceWorker.register('./service-worker.js?v=2.17', { updateViaCache: 'none' })
           .then(reg => {
             console.log('ServiceWorker registration successful with scope: ', reg.scope);
             reg.update();
